@@ -7,6 +7,7 @@ public class Review {
 	private int buyerId;
 	private int rating;
 	private String comment;
+	private String productName;
 	
 	public int getReviewId(){
 		return reviewId;
@@ -47,4 +48,12 @@ public class Review {
 	public void setComment(String comment){
 		this.comment = comment;
 	}
+	
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 }

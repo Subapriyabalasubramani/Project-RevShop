@@ -14,44 +14,167 @@ import java.sql.ResultSet;
 public class ReviewDAOImpl implements ReviewDAO {
 
 	@Override
-	public List<Review> getReviewsByProductId(int productId){
+	public List<Review> getReviewsByProductId(int productId) {
 		List<Review> reviews = new ArrayList<Review>();
-		
+
 		String sql = "SELECT * FROM PRODUCT_REVIEWS WHERE PRODUCT_ID = ?";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-		
-		try{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
 			con = DBConnection.getConnection();
 			ps = con.prepareStatement(sql);
-			
+
 			ps.setInt(1, productId);
 			rs = ps.executeQuery();
-			
-			while(rs.next()){
+
+			while (rs.next()) {
 				Review review = new Review();
-				
+
 				review.setReviewId(rs.getInt("REVIEW_ID"));
 				review.setRating(rs.getInt("RATING"));
-	            review.setComment(rs.getString("REVIEW_COMMENT"));
-	            reviews.add(review);
+				review.setComment(rs.getString("REVIEW_COMMENT"));
+				reviews.add(review);
+			}
+		} catch (SQLException e) {
+			System.out.println("Error fetching reviews");
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 		}
-		catch (SQLException e){
-			System.out.println("Error fetching reviews");
-		}
-		finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-		
+
 		return reviews;
 	}
+
+	@Override
+	public List<Review> getReviewsBySeller(int sellerId) {
+
+		List<Review> reviews = new ArrayList<Review>();
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String sql = "SELECT R.REVIEW_ID, R.PRODUCT_ID, P.NAME, R.RATING, R.REVIEW_COMMENT "
+				+ "FROM PRODUCT_REVIEWS R "
+				+ "JOIN PRODUCTS P ON R.PRODUCT_ID = P.PRODUCT_ID "
+				+ "WHERE P.SELLER_ID = ? ";
+
+		try {
+			con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, sellerId);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				Review review = new Review();
+				review.setReviewId(rs.getInt("REVIEW_ID"));
+				review.setProductId(rs.getInt("PRODUCT_ID"));
+				review.setProductName(rs.getString("NAME"));
+				review.setRating(rs.getInt("RATING"));
+				review.setComment(rs.getString("REVIEW_COMMENT"));
+				reviews.add(review);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return reviews;
+	}
+	
+	@Override
+	public boolean hasBuyerPurchasedProduct(int buyerId, int productId) {
+
+	    Connection con = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+
+	    String sql =
+	        "SELECT COUNT(*) FROM ORDER_ITEMS OI " +
+	        "JOIN ORDERS O ON OI.ORDER_ID = O.ORDER_ID " +
+	        "WHERE O.BUYER_ID = ? AND OI.PRODUCT_ID = ?";
+
+	    try {
+	        con = DBConnection.getConnection();
+	        ps = con.prepareStatement(sql);
+	        ps.setInt(1, buyerId);
+	        ps.setInt(2, productId);
+	        rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            return rs.getInt(1) > 0;
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (ps != null) ps.close();
+	            if (con != null) con.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return false;
+	}
+	
+	@Override
+	public void addReview(int buyerId, int productId, int rating, String comment) {
+
+	    Connection con = null;
+	    PreparedStatement ps = null;
+
+	    String sql =
+	        "INSERT INTO PRODUCT_REVIEWS " +
+	        "(REVIEW_ID, PRODUCT_ID, BUYER_ID, RATING, REVIEW_COMMENT, CREATED_AT) " +
+	        "VALUES (REVIEW_SEQ.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
+
+	    try {
+	        con = DBConnection.getConnection();
+	        ps = con.prepareStatement(sql);
+	        ps.setInt(1, productId);
+	        ps.setInt(2, buyerId);
+	        ps.setInt(3, rating);
+	        ps.setString(4, comment);
+	        ps.executeUpdate();
+
+	        System.out.println("Review submitted successfully");
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (ps != null) ps.close();
+	            if (con != null) con.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+
+
 }

@@ -10,11 +10,21 @@ import com.revshop.dao.impl.OrderDAOImpl;
 import com.revshop.model.Order;
 import com.revshop.model.CartItem;
 import com.revshop.model.User;
+import com.revshop.service.NotificationService;
+import com.revshop.dao.ProductDAO;
+import com.revshop.dao.impl.ProductDAOImpl;
+import com.revshop.service.PaymentService;
+
+
 
 public class CheckoutService {
 
 	private CartDAO cartDAO = new CartDAOImpl();
 	private OrderDAO orderDAO = new OrderDAOImpl();
+	private NotificationService notificationService = new NotificationService();
+	private ProductDAO productDAO = new ProductDAOImpl();
+	private PaymentService paymentService = new PaymentService();
+
 
 	public void checkout(User buyer, Scanner sc) {
 
@@ -62,6 +72,13 @@ public class CheckoutService {
 	        System.out.println("Order cancelled. Go back to cart.");
 	        return;
 	    }
+	    
+	    String paymentMode = paymentService.processPayment(sc);
+
+	    if (paymentMode == null) {
+	        System.out.println("Order cancelled due to payment failure");
+	        return;
+	    }
 
 	    Order order = new Order();
 	    order.setBuyerId(buyer.getUserId());
@@ -70,16 +87,34 @@ public class CheckoutService {
 	    order.setTotalAmount(total);
 
 	    int orderId = orderDAO.createOrder(order);
+	    
+	    orderDAO.updatePaymentDetails(
+	    	    orderId,
+	    	    paymentMode,
+	    	    "SUCCESS"
+	    	);
+
 
 	    for (CartItem item : cartItems) {
 	        orderDAO.addOrderItem(orderId, item);
 	        orderDAO.reduceProductStock(item.getProductId(), item.getQuantity());
+	        
+	        int sellerId =
+	                productDAO.getSellerIdByProductId(item.getProductId());
+
+	            notificationService.notifySeller(
+	                sellerId,
+	                "You have a new order for your product"
+	            );
 	    }
 
 	    orderDAO.clearCart(cartId);
 
-	    System.out.println("\n[NOTIFICATION] Your order has been placed successfully");
+	    System.out.println("\n[NOTIFICATION] Order placed successfully");
+	    System.out.println("Payment Mode: " + paymentMode);
+	    System.out.println("Payment Status: SUCCESS");
 	    System.out.println("Order ID: " + orderId);
+
 	}
 
 }

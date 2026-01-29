@@ -48,5 +48,54 @@ public class OrderService {
             );
         }
     }
+    
+    public boolean hasOrdersForSeller(int sellerId) {
+        return orderDAO.hasOrdersForSeller(sellerId);
+    }
+    
+    public void viewOrdersForSeller(User seller, Scanner sc) {
+
+        List<Order> orders = orderDAO.getOrdersForSeller(seller.getUserId());
+
+        if (orders.isEmpty()) {
+            System.out.println("No orders for your products yet.");
+            return;
+        }
+
+        System.out.println("\n--- Orders for Your Products ---");
+        for (Order order : orders) {
+            System.out.println(
+                "Order ID: " + order.getOrderId() +
+                " | Date: " + order.getOrderDate() +
+                " | Total: " + order.getTotalAmount()
+            );
+        }
+
+        System.out.print("\nEnter Order ID to view order items (0 to go back): ");
+        int orderId = sc.nextInt();
+        sc.nextLine();
+
+        if (orderId == 0) {
+            return;
+        }
+
+        List<CartItem> items =
+            orderDAO.getOrderItemsForSeller(orderId, seller.getUserId());
+
+        if (items.isEmpty()) {
+            System.out.println("No items found for this order.");
+            return;
+        }
+
+        System.out.println("\n--- Order Items ---");
+        for (CartItem item : items) {
+            System.out.println(
+                item.getProductName() +
+                " | Qty: " + item.getQuantity() +
+                " | Price: " + item.getPrice()
+            );
+        }
+    }
+        
 }
 

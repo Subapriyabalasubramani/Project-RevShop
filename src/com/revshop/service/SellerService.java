@@ -6,8 +6,15 @@ import com.revshop.model.User;
 public class SellerService {
 
 	ProductService productService = new ProductService();
+	OrderService orderService = new OrderService();
+	NotificationService notificationService = new NotificationService();
+	ReviewService reviewService = new ReviewService();
 
 	public void showSellerMenu(User seller, Scanner sc) {
+		
+		if (notificationService.hasUnreadNotifications(seller.getUserId())) {
+		    System.out.println("\n You have new notifications!");
+		}
 
 		boolean logout = false;
 
@@ -17,7 +24,9 @@ public class SellerService {
 			System.out.println("2. View My Products");
 			System.out.println("3. Update Product");
 			System.out.println("4. Delete Product");
-			System.out.println("5. Logout");
+			System.out.println("5. View my Orders");
+			System.out.println("6. View Reviews and Ratings");
+			System.out.println("7. Logout");
 			System.out.print("\nEnter a choice: ");
 
 			int choice = sc.nextInt();
@@ -37,6 +46,15 @@ public class SellerService {
 				productService.deleteSellerProduct(seller, sc);
 				break;
 			case 5:
+				orderService.viewOrdersForSeller(seller, sc);
+				notificationService.clearNotifications(seller.getUserId());
+				break;
+				
+			case 6:
+			    reviewService.viewReviewsForSellerProducts(seller.getUserId());
+			    break;
+
+			case 7:
 				System.out.println("Logged out successfully");
 				logout = true;
 				break;

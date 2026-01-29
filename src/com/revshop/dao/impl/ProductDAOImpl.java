@@ -173,7 +173,7 @@ public class ProductDAOImpl implements ProductDAO {
 	public List<Product> getAllProducts() {
 		List<Product> products = new ArrayList<Product>();
 
-		String sql = "SELECT PRODUCT_ID, NAME FROM PRODUCTS";
+		String sql = "SELECT PRODUCT_ID, NAME, DISCOUNT_PRICE FROM PRODUCTS";
 		
 		Connection con = null;
         PreparedStatement ps = null;
@@ -189,6 +189,7 @@ public class ProductDAOImpl implements ProductDAO {
 				Product product = new Product();
 				product.setProductId(rs.getInt("PRODUCT_ID"));
 				product.setName(rs.getString("NAME"));
+				product.setDiscountPrice(rs.getDouble("DISCOUNT_PRICE"));
 
 				products.add(product);
 			}
@@ -342,5 +343,41 @@ public class ProductDAOImpl implements ProductDAO {
 
 		return products;
 	}
+	
+	@Override
+	public int getSellerIdByProductId(int productId) {
+
+	    String sql = "SELECT SELLER_ID FROM PRODUCTS WHERE PRODUCT_ID = ?";
+	    int sellerId = -1;
+	    
+	    Connection con = null;
+        PreparedStatement ps = null;
+
+	    try {
+	    	con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
+
+	        ps.setInt(1, productId);
+	        ResultSet rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            sellerId = rs.getInt("SELLER_ID");
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+	    return sellerId;
+	}
+
 
 }

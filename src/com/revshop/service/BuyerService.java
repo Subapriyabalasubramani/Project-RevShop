@@ -9,6 +9,8 @@ public class BuyerService {
 	CartService cartService = new CartService();
 	CheckoutService checkoutService = new CheckoutService();
 	OrderService orderService = new OrderService();
+	FavoritesService favoritesService = new FavoritesService();
+	ReviewService reviewService = new ReviewService();
 
 	public void showBuyerMenu(User buyer, Scanner sc) {
 		boolean logout = false;
@@ -23,7 +25,9 @@ public class BuyerService {
 			System.out.println("6. Remove from Cart");
 			System.out.println("7. Checkout");
 			System.out.println("8. Order History");
-			System.out.println("9. Logout");
+			System.out.println("9. Save to favorties");
+			System.out.println("10. Review & Ratings");
+			System.out.println("11. Logout");
 			System.out.print("\nEnter choice: ");
 
 			int choice = sc.nextInt();
@@ -61,8 +65,16 @@ public class BuyerService {
 			case 8:
 				orderService.viewOrderHistory(buyer, sc);
 				break;
-
+				
 			case 9:
+				favoritesService.addToFavorites(buyer, sc);
+				break;
+				
+			case 10: 
+				reviewService.addReview(buyer, sc);
+				break;
+				
+			case 11:
 				logout = true;
 				System.out.println("Logged out successfully");
 				break;

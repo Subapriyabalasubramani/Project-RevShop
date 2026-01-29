@@ -17,9 +17,10 @@ public class OrderDAOImpl implements OrderDAO {
     @Override
     public int createOrder(Order order) {
 
-        String sql =
-            "INSERT INTO ORDERS VALUES " +
-            "(ORDER_SEQ.NEXTVAL, ?, SYSDATE, ?, ?, ?)";
+    	String sql =
+    	        "INSERT INTO ORDERS " +
+    	        "(ORDER_ID, BUYER_ID, SHIPPING_ADDRESS, BILLING_ADDRESS, TOTAL_AMOUNT, ORDER_DATE, PAYMENT_MODE, PAYMENT_STATUS) " +
+    	        "VALUES (ORDER_SEQ.NEXTVAL, ?, ?, ?, ?, SYSDATE, ?, ?)";
 
         int orderId = -1;
         
@@ -36,6 +37,8 @@ public class OrderDAOImpl implements OrderDAO {
             ps.setString(2, order.getShippingAddress());
             ps.setString(3, order.getBillingAddress());
             ps.setDouble(4, order.getTotalAmount());
+            ps.setString(5, "COD");
+            ps.setString(6, "SUCCESS");
 
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
@@ -237,5 +240,208 @@ public class OrderDAOImpl implements OrderDAO {
         }
         return items;
     }
+    
+    @Override
+    public boolean hasOrdersForSeller(int sellerId) {
+
+        String sql =
+            "SELECT COUNT(*) FROM ORDER_ITEMS OI " +
+            "JOIN PRODUCTS P ON OI.PRODUCT_ID = P.PRODUCT_ID " +
+            "WHERE P.SELLER_ID = ?";
+        
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try{
+        	con = DBConnection.getConnection();
+        	ps = con.prepareStatement(sql);
+            ps.setInt(1, sellerId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public List<Order> getOrdersForSeller(int sellerId) {
+
+        List<Order> orders = new ArrayList<Order>();
+
+        String sql =
+            "SELECT DISTINCT O.ORDER_ID, O.ORDER_DATE, O.TOTAL_AMOUNT " +
+            "FROM ORDERS O " +
+            "JOIN ORDER_ITEMS OI ON O.ORDER_ID = OI.ORDER_ID " +
+            "JOIN PRODUCTS P ON OI.PRODUCT_ID = P.PRODUCT_ID " +
+            "WHERE P.SELLER_ID = ? " +
+            "ORDER BY O.ORDER_DATE DESC";
+        
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try{
+        	con = DBConnection.getConnection();
+        	ps = con.prepareStatement(sql);
+            ps.setInt(1, sellerId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("ORDER_ID"));
+                order.setOrderDate(rs.getDate("ORDER_DATE"));
+                order.setTotalAmount(rs.getDouble("TOTAL_AMOUNT"));
+                orders.add(order);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if(rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public List<CartItem> getOrderItemsForSeller(int orderId, int sellerId) {
+
+        List<CartItem> items = new ArrayList<CartItem>();
+
+        String sql =
+            "SELECT P.NAME, OI.PRODUCT_ID, OI.QUANTITY, OI.PRICE " +
+            "FROM ORDER_ITEMS OI " +
+            "JOIN PRODUCTS P ON OI.PRODUCT_ID = P.PRODUCT_ID " +
+            "WHERE OI.ORDER_ID = ? AND P.SELLER_ID = ?";
+        
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try{
+        	con = DBConnection.getConnection();
+        	ps = con.prepareStatement(sql);
+            ps.setInt(1, orderId);
+            ps.setInt(2, sellerId);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                CartItem item = new CartItem();
+                item.setProductId(rs.getInt("PRODUCT_ID"));
+                item.setProductName(rs.getString("NAME"));
+                item.setQuantity(rs.getInt("QUANTITY"));
+                item.setPrice(rs.getDouble("PRICE"));
+                items.add(item);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return items;
+    }
+
+
+    @Override
+    public List<CartItem> getPurchasedProducts(int buyerId) {
+
+        List<CartItem> items = new ArrayList<CartItem>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String sql =
+            "SELECT DISTINCT OI.PRODUCT_ID, P.NAME " +
+            "FROM ORDER_ITEMS OI " +
+            "JOIN ORDERS O ON OI.ORDER_ID = O.ORDER_ID " +
+            "JOIN PRODUCTS P ON OI.PRODUCT_ID = P.PRODUCT_ID " +
+            "WHERE O.BUYER_ID = ?";
+
+        try {
+            con = DBConnection.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, buyerId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                CartItem item = new CartItem();
+                item.setProductId(rs.getInt("PRODUCT_ID"));
+                item.setProductName(rs.getString("NAME"));
+                items.add(item);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return items;
+    }
+    
+    @Override
+    public void updatePaymentDetails(int orderId, String paymentMode, String paymentStatus) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        String sql =
+            "UPDATE ORDERS SET PAYMENT_MODE = ?, PAYMENT_STATUS = ? WHERE ORDER_ID = ?";
+
+        try {
+            con = DBConnection.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, paymentMode);
+            ps.setString(2, paymentStatus);
+            ps.setInt(3, orderId);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }

@@ -18,5 +18,16 @@ public interface OrderDAO {
 	List<Order> getOrdersByBuyer(int buyerId);
 
 	List<CartItem> getOrderItems(int orderId);
+	
+	List<Order> getOrdersForSeller(int sellerId);
+
+	List<CartItem> getOrderItemsForSeller(int orderId, int sellerId);
+
+	boolean hasOrdersForSeller(int sellerId);
+
+	List<CartItem> getPurchasedProducts(int buyerId);
+	
+	void updatePaymentDetails(int orderId, String paymentMode, String paymentStatus);
+
 
 }
