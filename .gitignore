@@ -1,0 +1,8 @@
+# Database credentials
+src/com/revshop/config/DatabaseConfig.java
+
+# Eclipse files
+.classpath
+.project
+.settings/
+bin/
