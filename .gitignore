@@ -6,3 +6,8 @@ src/com/revshop/config/DatabaseConfig.java
 .project
 .settings/
 bin/
+
+# Log files
+*.log
+*.log.lck
+

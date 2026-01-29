@@ -10,16 +10,22 @@ import com.revshop.model.CartItem;
 import com.revshop.model.Review;
 import com.revshop.model.User;
 import java.util.Scanner;
+import java.util.logging.Logger;
+
 
 public class ReviewService {
+	private static final Logger LOGGER =
+	        Logger.getLogger(ReviewService.class.getName());
 
 	public void viewReviewsForSellerProducts(int sellerId) {
+		LOGGER.info("Seller requested reviews for products. sellerId: " + sellerId);
 
 		ReviewDAO reviewDAO = new ReviewDAOImpl();
 		
 	    List<Review> reviews = reviewDAO.getReviewsBySeller(sellerId);
 
 	    if (reviews.isEmpty()) {
+	    	LOGGER.info("No reviews found for sellerId: " + sellerId);
 	        System.out.println("No reviews available for your products.");
 	        return;
 	    }
@@ -37,6 +43,8 @@ public class ReviewService {
 	}
 	
 	public void addReview(User buyer, Scanner sc) {
+		LOGGER.info("Add review initiated by buyerId: " + buyer.getUserId());
+
 
 	    OrderDAO orderDAO = new OrderDAOImpl();
 	    ReviewDAO reviewDAO = new ReviewDAOImpl();
@@ -45,6 +53,7 @@ public class ReviewService {
 	        orderDAO.getPurchasedProducts(buyer.getUserId());
 
 	    if (purchasedItems.isEmpty()) {
+	    	LOGGER.info("Buyer has no purchased products to review. buyerId: " + buyer.getUserId());
 	        System.out.println("You have not purchased any products yet.");
 	        return;
 	    }
@@ -71,6 +80,8 @@ public class ReviewService {
 	    }
 
 	    if (!valid) {
+	    	LOGGER.warning("Invalid product selected for review. buyerId: " +
+	                   buyer.getUserId() + ", productId: " + productId);
 	        System.out.println("Invalid product selection.");
 	        return;
 	    }
@@ -88,6 +99,8 @@ public class ReviewService {
 	        rating,
 	        comment
 	    );
+	    LOGGER.info("Review added successfully. buyerId: " +
+	            buyer.getUserId() + ", productId: " + productId);
 	}
 
 }

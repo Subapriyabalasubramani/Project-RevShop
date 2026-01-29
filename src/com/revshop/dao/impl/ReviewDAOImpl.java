@@ -3,6 +3,7 @@ package com.revshop.dao.impl;
 import com.revshop.model.Review;
 import com.revshop.dao.ReviewDAO;
 import com.revshop.config.DBConnection;
+import java.util.logging.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.sql.ResultSet;
 
 public class ReviewDAOImpl implements ReviewDAO {
+	private static final Logger LOGGER = Logger.getLogger(ReviewDAOImpl.class
+			.getName());
 
 	@Override
 	public List<Review> getReviewsByProductId(int productId) {
@@ -39,6 +42,8 @@ public class ReviewDAOImpl implements ReviewDAO {
 				reviews.add(review);
 			}
 		} catch (SQLException e) {
+			LOGGER.severe("Error fetching reviews for productId: " + productId
+					+ " | " + e.getMessage());
 			System.out.println("Error fetching reviews");
 		} finally {
 			try {
@@ -49,6 +54,8 @@ public class ReviewDAOImpl implements ReviewDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getReviewsByProductId: "
+						+ e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -87,6 +94,8 @@ public class ReviewDAOImpl implements ReviewDAO {
 			}
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error fetching reviews for sellerId: " + sellerId
+					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 
@@ -98,83 +107,98 @@ public class ReviewDAOImpl implements ReviewDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getReviewsBySeller: "
+						+ e.getMessage());
 				e.printStackTrace();
 			}
 		}
 
 		return reviews;
 	}
-	
+
 	@Override
 	public boolean hasBuyerPurchasedProduct(int buyerId, int productId) {
 
-	    Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
-	    String sql =
-	        "SELECT COUNT(*) FROM ORDER_ITEMS OI " +
-	        "JOIN ORDERS O ON OI.ORDER_ID = O.ORDER_ID " +
-	        "WHERE O.BUYER_ID = ? AND OI.PRODUCT_ID = ?";
+		String sql = "SELECT COUNT(*) FROM ORDER_ITEMS OI "
+				+ "JOIN ORDERS O ON OI.ORDER_ID = O.ORDER_ID "
+				+ "WHERE O.BUYER_ID = ? AND OI.PRODUCT_ID = ?";
 
-	    try {
-	        con = DBConnection.getConnection();
-	        ps = con.prepareStatement(sql);
-	        ps.setInt(1, buyerId);
-	        ps.setInt(2, productId);
-	        rs = ps.executeQuery();
+		try {
+			con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, buyerId);
+			ps.setInt(2, productId);
+			rs = ps.executeQuery();
 
-	        if (rs.next()) {
-	            return rs.getInt(1) > 0;
-	        }
+			if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (rs != null) rs.close();
-	            if (ps != null) ps.close();
-	            if (con != null) con.close();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    return false;
+		} catch (SQLException e) {
+			LOGGER.severe("Error checking purchase history. buyerId: "
+					+ buyerId + ", productId: " + productId + " | "
+					+ e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in hasBuyerPurchasedProduct: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
-	
+
 	@Override
 	public void addReview(int buyerId, int productId, int rating, String comment) {
 
-	    Connection con = null;
-	    PreparedStatement ps = null;
+		Connection con = null;
+		PreparedStatement ps = null;
 
-	    String sql =
-	        "INSERT INTO PRODUCT_REVIEWS " +
-	        "(REVIEW_ID, PRODUCT_ID, BUYER_ID, RATING, REVIEW_COMMENT, CREATED_AT) " +
-	        "VALUES (REVIEW_SEQ.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
+		String sql = "INSERT INTO PRODUCT_REVIEWS "
+				+ "(REVIEW_ID, PRODUCT_ID, BUYER_ID, RATING, REVIEW_COMMENT, CREATED_AT) "
+				+ "VALUES (REVIEW_SEQ.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
 
-	    try {
-	        con = DBConnection.getConnection();
-	        ps = con.prepareStatement(sql);
-	        ps.setInt(1, productId);
-	        ps.setInt(2, buyerId);
-	        ps.setInt(3, rating);
-	        ps.setString(4, comment);
-	        ps.executeUpdate();
+		try {
+			con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, productId);
+			ps.setInt(2, buyerId);
+			ps.setInt(3, rating);
+			ps.setString(4, comment);
+			ps.executeUpdate();
 
-	        System.out.println("Review submitted successfully");
+			LOGGER.info("Review added successfully. buyerId: " + buyerId
+					+ ", productId: " + productId);
+			System.out.println("Review submitted successfully");
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (ps != null) ps.close();
-	            if (con != null) con.close();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	    }
+		} catch (SQLException e) {
+			LOGGER.severe("Error adding review. buyerId: " + buyerId
+					+ ", productId: " + productId + " | " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in addReview: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
-
 
 }

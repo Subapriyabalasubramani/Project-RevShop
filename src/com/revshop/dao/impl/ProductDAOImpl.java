@@ -1,5 +1,6 @@
 package com.revshop.dao.impl;
 
+import java.util.logging.Logger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,19 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAOImpl implements ProductDAO {
+	private static final Logger LOGGER = Logger.getLogger(ProductDAOImpl.class
+			.getName());
 
 	@Override
 	public void addProduct(Product product) {
 		String sql = "INSERT INTO PRODUCTS"
 				+ "(PRODUCT_ID, NAME, DESCRIPTION, CATEGORY, MRP, DISCOUNT_PRICE, QUANTITY, SELLER_ID)"
 				+ "VALUES(PRODUCT_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?)";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        
+		PreparedStatement ps = null;
+
 		try {
 			con = DBConnection.getConnection(); // live connection
-															// object to db
+												// object to db
 			ps = con.prepareStatement(sql);
 
 			ps.setString(1, product.getName());
@@ -36,19 +39,26 @@ public class ProductDAOImpl implements ProductDAO {
 
 			ps.executeUpdate();
 
+			LOGGER.info("Product added successfully. sellerId: "
+					+ product.getSellerId());
 			System.out.println("Product added successfully!");
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error adding product. sellerId: "
+					+ product.getSellerId() + " | " + e.getMessage());
 			System.out.println("Error adding product");
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in addProduct: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 	}
 
 	@Override
@@ -57,10 +67,10 @@ public class ProductDAOImpl implements ProductDAO {
 		List<Product> products = new ArrayList<Product>();
 
 		String sql = "SELECT * FROM PRODUCTS WHERE SELLER_ID = ?";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
 			con = DBConnection.getConnection();
@@ -83,17 +93,23 @@ public class ProductDAOImpl implements ProductDAO {
 				products.add(product);
 			}
 		} catch (SQLException e) {
+			LOGGER.severe("Error fetching products for sellerId: " + sellerId
+					+ " | " + e.getMessage());
 			System.out.println("Error fetching products");
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getProductsBySeller: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 
 		return products;
 	}
@@ -104,10 +120,9 @@ public class ProductDAOImpl implements ProductDAO {
 		String sql = "UPDATE PRODUCTS "
 				+ "SET MRP = ?, DISCOUNT_PRICE = ?, QUANTITY = ? "
 				+ "WHERE PRODUCT_ID = ? AND SELLER_ID = ?";
-		
-		Connection con = null;
-        PreparedStatement ps = null;
 
+		Connection con = null;
+		PreparedStatement ps = null;
 
 		try {
 			con = DBConnection.getConnection();
@@ -123,31 +138,36 @@ public class ProductDAOImpl implements ProductDAO {
 
 			return rows > 0;
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			LOGGER.severe("Error updating product. productId: "
+					+ product.getProductId() + ", sellerId: "
+					+ product.getSellerId() + " | " + e.getMessage());
 			System.out.println("Error updating product");
 			return false;
-		}finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in updateProduct: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
 	public boolean deleteProduct(int productId, int sellerId) {
 
 		String sql = "DELETE FROM PRODUCTS WHERE PRODUCT_ID = ? AND SELLER_ID = ?";
-		
-		Connection con = null;
-        PreparedStatement ps = null;
 
+		Connection con = null;
+		PreparedStatement ps = null;
 
 		try {
-              con = DBConnection.getConnection();
-			  ps = con.prepareStatement(sql);
+			con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
 
 			ps.setInt(1, productId);
 			ps.setInt(2, sellerId);
@@ -156,17 +176,22 @@ public class ProductDAOImpl implements ProductDAO {
 
 			return rows > 0;
 		} catch (SQLException e) {
+			LOGGER.severe("Error deleting product. productId: " + productId
+					+ ", sellerId: " + sellerId + " | " + e.getMessage());
 			System.out.println("Error deleting product");
 			return false;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in deleteProduct: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 	}
 
 	@Override
@@ -174,10 +199,10 @@ public class ProductDAOImpl implements ProductDAO {
 		List<Product> products = new ArrayList<Product>();
 
 		String sql = "SELECT PRODUCT_ID, NAME, DISCOUNT_PRICE FROM PRODUCTS";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
 			con = DBConnection.getConnection();
@@ -194,16 +219,22 @@ public class ProductDAOImpl implements ProductDAO {
 				products.add(product);
 			}
 		} catch (SQLException e) {
+			LOGGER.severe("Error fetching all products | " + e.getMessage());
 			System.out.println("Error fetching products");
-		}finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getAllProducts: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
 
 		return products;
 	}
@@ -214,14 +245,14 @@ public class ProductDAOImpl implements ProductDAO {
 		String sql = "SELECT * FROM PRODUCTS WHERE PRODUCT_ID = ?";
 
 		Product product = null;
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
-			   con = DBConnection.getConnection();
-               ps = con.prepareStatement(sql);
+			con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
 
 			ps.setInt(1, productId);
 			rs = ps.executeQuery();
@@ -237,17 +268,23 @@ public class ProductDAOImpl implements ProductDAO {
 				product.setQuantity(rs.getInt("QUANTITY"));
 			}
 		} catch (SQLException e) {
+			LOGGER.severe("Error fetching product details. productId: "
+					+ productId + " | " + e.getMessage());
 			System.out.println("Error fetching product details");
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getProductById: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 		return product;
 	}
 
@@ -256,17 +293,17 @@ public class ProductDAOImpl implements ProductDAO {
 
 		List<Product> products = new ArrayList<Product>();
 		String sql = "SELECT * FROM PRODUCTS WHERE LOWER(CATEGORY) = LOWER(?)";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
-	          con = DBConnection.getConnection();
-			  ps = con.prepareStatement(sql);
+			con = DBConnection.getConnection();
+			ps = con.prepareStatement(sql);
 
 			ps.setString(1, category);
-			 rs = ps.executeQuery();
+			rs = ps.executeQuery();
 
 			while (rs.next()) {
 				Product p = new Product();
@@ -280,17 +317,23 @@ public class ProductDAOImpl implements ProductDAO {
 			}
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error fetching products by category: " + category
+					+ " | " + e.getMessage());
 			System.out.println("Error fetching products by category");
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getProductsByCategory: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 
 		return products;
 	}
@@ -301,10 +344,10 @@ public class ProductDAOImpl implements ProductDAO {
 		List<Product> products = new ArrayList<Product>();
 		String sql = "SELECT * FROM PRODUCTS "
 				+ "WHERE LOWER(NAME) LIKE ? OR LOWER(DESCRIPTION) LIKE ?";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
 
@@ -329,55 +372,65 @@ public class ProductDAOImpl implements ProductDAO {
 			}
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error searching products. keyword: " + keyword
+					+ " | " + e.getMessage());
 			System.out.println("Error searching products");
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in searchProducts: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 
 		return products;
 	}
-	
+
 	@Override
 	public int getSellerIdByProductId(int productId) {
 
-	    String sql = "SELECT SELLER_ID FROM PRODUCTS WHERE PRODUCT_ID = ?";
-	    int sellerId = -1;
-	    
-	    Connection con = null;
-        PreparedStatement ps = null;
+		String sql = "SELECT SELLER_ID FROM PRODUCTS WHERE PRODUCT_ID = ?";
+		int sellerId = -1;
 
-	    try {
-	    	con = DBConnection.getConnection();
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = DBConnection.getConnection();
 			ps = con.prepareStatement(sql);
 
-	        ps.setInt(1, productId);
-	        ResultSet rs = ps.executeQuery();
+			ps.setInt(1, productId);
+			ResultSet rs = ps.executeQuery();
 
-	        if (rs.next()) {
-	            sellerId = rs.getInt("SELLER_ID");
-	        }
+			if (rs.next()) {
+				sellerId = rs.getInt("SELLER_ID");
+			}
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	    finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		} catch (SQLException e) {
+			LOGGER.severe("Error fetching sellerId for productId: " + productId
+					+ " | " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getSellerIdByProductId: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
 
-	    return sellerId;
+		return sellerId;
 	}
-
 
 }

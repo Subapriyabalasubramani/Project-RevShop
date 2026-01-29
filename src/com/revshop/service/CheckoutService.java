@@ -2,6 +2,7 @@ package com.revshop.service;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import com.revshop.dao.OrderDAO;
 import com.revshop.dao.CartDAO;
@@ -18,6 +19,8 @@ import com.revshop.service.PaymentService;
 
 
 public class CheckoutService {
+	private static final Logger LOGGER =
+	        Logger.getLogger(CheckoutService.class.getName());
 
 	private CartDAO cartDAO = new CartDAOImpl();
 	private OrderDAO orderDAO = new OrderDAOImpl();
@@ -27,10 +30,12 @@ public class CheckoutService {
 
 
 	public void checkout(User buyer, Scanner sc) {
+		LOGGER.info("Checkout initiated. buyerId: " + buyer.getUserId());
 
 	    int cartId = cartDAO.getCartIdByBuyer(buyer.getUserId());
 
 	    if (cartId == -1) {
+	    	LOGGER.info("Checkout failed: cart not found. buyerId: " + buyer.getUserId());
 	        System.out.println("Cart is empty");
 	        return;
 	    }
@@ -38,6 +43,7 @@ public class CheckoutService {
 	    List<CartItem> cartItems = cartDAO.viewCart(cartId);
 
 	    if (cartItems.isEmpty()) {
+	    	LOGGER.info("Checkout failed: cart empty. buyerId: " + buyer.getUserId());
 	        System.out.println("Cart is empty");
 	        return;
 	    }
@@ -69,6 +75,7 @@ public class CheckoutService {
 	    String confirm = sc.nextLine();
 
 	    if (!confirm.equalsIgnoreCase("yes")) {
+	    	LOGGER.info("Checkout cancelled by buyer before payment. buyerId: " + buyer.getUserId());
 	        System.out.println("Order cancelled. Go back to cart.");
 	        return;
 	    }
@@ -76,9 +83,13 @@ public class CheckoutService {
 	    String paymentMode = paymentService.processPayment(sc);
 
 	    if (paymentMode == null) {
+	    	LOGGER.warning("Payment failed. Checkout aborted. buyerId: " + buyer.getUserId());
 	        System.out.println("Order cancelled due to payment failure");
 	        return;
 	    }
+	    
+	    LOGGER.info("Payment successful. Mode: " + paymentMode +
+	            ", buyerId: " + buyer.getUserId());
 
 	    Order order = new Order();
 	    order.setBuyerId(buyer.getUserId());
@@ -87,6 +98,8 @@ public class CheckoutService {
 	    order.setTotalAmount(total);
 
 	    int orderId = orderDAO.createOrder(order);
+	    LOGGER.info("Order created successfully. orderId: " + orderId +
+	            ", buyerId: " + buyer.getUserId());
 	    
 	    orderDAO.updatePaymentDetails(
 	    	    orderId,
@@ -109,12 +122,14 @@ public class CheckoutService {
 	    }
 
 	    orderDAO.clearCart(cartId);
+	    LOGGER.info("Checkout completed successfully. orderId: " + orderId +
+	            ", buyerId: " + buyer.getUserId());
 
 	    System.out.println("\n[NOTIFICATION] Order placed successfully");
 	    System.out.println("Payment Mode: " + paymentMode);
 	    System.out.println("Payment Status: SUCCESS");
 	    System.out.println("Order ID: " + orderId);
-
+	    LOGGER.info("Order items processed and sellers notified. orderId: " + orderId);
 	}
 
 }

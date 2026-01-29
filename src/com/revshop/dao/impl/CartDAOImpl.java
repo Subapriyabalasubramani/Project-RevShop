@@ -8,18 +8,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.revshop.config.DBConnection;
 
 public class CartDAOImpl implements CartDAO {
+	private static final Logger LOGGER = Logger.getLogger(CartDAOImpl.class
+			.getName());
 
 	@Override
 	public int getCartIdByBuyer(int buyerId) {
 		String sql = "SELECT CART_ID FROM CART WHERE BUYER_ID = ?";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
 			con = DBConnection.getConnection();
 			ps = con.prepareStatement(sql);
@@ -30,16 +33,23 @@ public class CartDAOImpl implements CartDAO {
 			}
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error getting cartId for buyerId: " + buyerId
+					+ " | " + e.getMessage());
 			System.out.println("Error getting cart");
-		}finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error getting cartId for buyerId: " + buyerId
+						+ " | " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
 		return -1;
 	}
 
@@ -47,9 +57,9 @@ public class CartDAOImpl implements CartDAO {
 	public void createCart(int buyerId) {
 
 		String sql = "INSERT INTO CART VALUES (CART_SEQ.NEXTVAL, ?)";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
+		PreparedStatement ps = null;
 
 		try {
 
@@ -59,15 +69,21 @@ public class CartDAOImpl implements CartDAO {
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error getting cartId for buyerId: " + buyerId
+					+ " | " + e.getMessage());
 			System.out.println("Error creating cart");
-		}finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error getting cartId for buyerId: " + buyerId
+						+ " | " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -75,9 +91,9 @@ public class CartDAOImpl implements CartDAO {
 
 		String sql = "INSERT INTO CART_ITEMS VALUES "
 				+ "(CART_ITEM_SEQ.NEXTVAL, ?, ?, ?, ?)";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
+		PreparedStatement ps = null;
 
 		try {
 
@@ -90,16 +106,21 @@ public class CartDAOImpl implements CartDAO {
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error adding to cart. cartId: " + cartId
+					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error adding to cart");
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in addToCart: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 	}
 
 	@Override
@@ -110,10 +131,10 @@ public class CartDAOImpl implements CartDAO {
 		String sql = "SELECT P.NAME, CI.PRODUCT_ID, CI.QUANTITY, CI.PRICE "
 				+ "FROM CART_ITEMS CI JOIN PRODUCTS P "
 				+ "ON CI.PRODUCT_ID = P.PRODUCT_ID " + "WHERE CI.CART_ID = ?";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
 		try {
 
@@ -133,17 +154,23 @@ public class CartDAOImpl implements CartDAO {
 			}
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error viewing cart. cartId: " + cartId + " | "
+					+ e.getMessage());
 			System.out.println("Error viewing cart");
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in viewCart: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-            	if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 		return items;
 	}
 
@@ -152,9 +179,9 @@ public class CartDAOImpl implements CartDAO {
 
 		String sql = "UPDATE CART_ITEMS SET QUANTITY = ? "
 				+ "WHERE CART_ID = ? AND PRODUCT_ID = ? ";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
+		PreparedStatement ps = null;
 
 		try {
 
@@ -166,45 +193,56 @@ public class CartDAOImpl implements CartDAO {
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error updating cart item. cartId: " + cartId
+					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error updating cart item");
 			e.printStackTrace();
-		}finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in updateCartItem: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
 	public void removeFromCart(int cartId, int productId) {
 
 		String sql = "DELETE FROM CART_ITEMS WHERE CART_ID = ? AND PRODUCT_ID = ?";
-		
+
 		Connection con = null;
-        PreparedStatement ps = null;
+		PreparedStatement ps = null;
 
 		try {
 
 			con = DBConnection.getConnection();
-		    ps = con.prepareStatement(sql);
+			ps = con.prepareStatement(sql);
 
 			ps.setInt(1, cartId);
 			ps.setInt(2, productId);
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error removing item from cart. cartId: " + cartId
+					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error removing item");
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in removeFromCart: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
 	}
 }

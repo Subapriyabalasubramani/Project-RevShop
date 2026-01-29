@@ -6,11 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.revshop.config.DBConnection;
 import com.revshop.dao.NotificationDAO;
 
 public class NotificationDAOImpl implements NotificationDAO {
+	private static final Logger LOGGER = Logger
+			.getLogger(NotificationDAOImpl.class.getName());
 
 	@Override
 	public void createNotification(int sellerId, String message) {
@@ -31,6 +34,8 @@ public class NotificationDAOImpl implements NotificationDAO {
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error creating notification for sellerId: "
+					+ sellerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			try {
@@ -39,6 +44,8 @@ public class NotificationDAOImpl implements NotificationDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in createNotification: "
+						+ e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -65,6 +72,8 @@ public class NotificationDAOImpl implements NotificationDAO {
 			}
 
 		} catch (SQLException e) {
+			LOGGER.severe("Error checking unread notifications for sellerId: "
+					+ sellerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			try {
@@ -75,80 +84,92 @@ public class NotificationDAOImpl implements NotificationDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in hasUnreadNotifications: "
+						+ e.getMessage());
 				e.printStackTrace();
 			}
 		}
 
 		return false;
 	}
-	
-	@Override
-    public List<String> getUnreadNotifications(int sellerId) {
 
-        List<String> messages = new ArrayList<String>();
-        
-        Connection con = null;
+	@Override
+	public List<String> getUnreadNotifications(int sellerId) {
+
+		List<String> messages = new ArrayList<String>();
+
+		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-        String sql =
-            "SELECT MESSAGE FROM NOTIFICATIONS " +
-            "WHERE SELLER_ID = ? AND IS_READ = 'N'";
+		String sql = "SELECT MESSAGE FROM NOTIFICATIONS "
+				+ "WHERE SELLER_ID = ? AND IS_READ = 'N'";
 
-        try{
-        	con = DBConnection.getConnection();
+		try {
+			con = DBConnection.getConnection();
 			ps = con.prepareStatement(sql);
 
-            ps.setInt(1, sellerId);
-            rs = ps.executeQuery();
+			ps.setInt(1, sellerId);
+			rs = ps.executeQuery();
 
-            while (rs.next()) {
-                messages.add(rs.getString("MESSAGE"));
-            }
+			while (rs.next()) {
+				messages.add(rs.getString("MESSAGE"));
+			}
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if(rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return messages;
-    }
-	
+		} catch (SQLException e) {
+			LOGGER.severe("Error fetching unread notifications for sellerId: "
+					+ sellerId + " | " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in getUnreadNotifications: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		return messages;
+	}
+
 	@Override
-    public void markNotificationsAsRead(int sellerId) {
+	public void markNotificationsAsRead(int sellerId) {
 
-        String sql =
-            "UPDATE NOTIFICATIONS SET IS_READ = 'Y' " +
-            "WHERE SELLER_ID = ? AND IS_READ = 'N'";
-        
-        Connection con = null;
-        PreparedStatement ps = null;
+		String sql = "UPDATE NOTIFICATIONS SET IS_READ = 'Y' "
+				+ "WHERE SELLER_ID = ? AND IS_READ = 'N'";
 
-        try{
+		Connection con = null;
+		PreparedStatement ps = null;
 
-        	con = DBConnection.getConnection();
+		try {
+
+			con = DBConnection.getConnection();
 			ps = con.prepareStatement(sql);
-			
-            ps.setInt(1, sellerId);
-            ps.executeUpdate();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+			ps.setInt(1, sellerId);
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			LOGGER.severe("Error marking notifications as read for sellerId: "
+					+ sellerId + " | " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (con != null)
+					con.close();
+			} catch (SQLException e) {
+				LOGGER.severe("Error closing DB resources in markNotificationsAsRead: "
+						+ e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
 
 }

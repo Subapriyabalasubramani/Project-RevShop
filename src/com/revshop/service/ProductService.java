@@ -8,13 +8,19 @@ import com.revshop.dao.ProductDAO;
 import java.util.List;
 import com.revshop.dao.ReviewDAO;
 import com.revshop.dao.impl.ReviewDAOImpl;
+import java.util.logging.Logger;
+
 
 public class ProductService {
+	private static final Logger LOGGER =
+	        Logger.getLogger(ProductService.class.getName());
 
 	private ProductDAO productDAO = new ProductDAOImpl();
 	private ReviewDAO reviewDAO = new ReviewDAOImpl();
 
 	public void addSellerProduct(User seller, Scanner sc) {
+		LOGGER.info("Add product initiated by sellerId: " + seller.getUserId());
+
 		System.out.print("Enter product name: ");
 		String name = sc.nextLine();
 
@@ -35,6 +41,7 @@ public class ProductService {
 		sc.nextLine();
 
 		if (discount > mrp) {
+			LOGGER.warning("Product add failed: discount > MRP. sellerId: " + seller.getUserId());
 			System.out.println("Discount price cannot be greater than MRP");
 			return;
 		}
@@ -50,13 +57,16 @@ public class ProductService {
 		product.setSellerId(seller.getUserId());
 
 		productDAO.addProduct(product);
+		LOGGER.info("Product added successfully by sellerId: " + seller.getUserId());
 
 	}
 	
 	public void viewBySellerProducts(int sellerId){
+		LOGGER.info("View seller products requested. sellerId: " + sellerId);
 		List<Product> products = productDAO.getProductsBySeller(sellerId);
 		
 		if(products.isEmpty()){
+			LOGGER.info("No products found for sellerId: " + sellerId);
 			System.out.println("No products found");
 			return;
 		}
@@ -80,6 +90,8 @@ public class ProductService {
 	}
 	
 	public void updateSellerProduct(User seller, Scanner sc){
+		LOGGER.info("Update product initiated. sellerId: " + seller.getUserId());
+
 		
 		viewBySellerProducts(seller.getUserId());
 		
@@ -97,6 +109,7 @@ public class ProductService {
         sc.nextLine();
 
         if (discount > mrp) {
+        	 LOGGER.warning("Product update failed: discount > MRP. sellerId: " + seller.getUserId());
             System.out.println("Discount price cannot be greater than MRP");
             return;
         }
@@ -112,14 +125,20 @@ public class ProductService {
         boolean updatedProduct = productDAO.updateProduct(product);
         
         if(updatedProduct){
+        	LOGGER.info("Product updated successfully. productId: " + productId +
+                    ", sellerId: " + seller.getUserId());
         	System.out.println("Product updated successfully");
         }
         else{
+        	LOGGER.warning("Product update failed. productId: " + productId +
+                    ", sellerId: " + seller.getUserId());
         	System.out.println("Update Failed. Please check the product id");
         }
 	}
 	
 	public void deleteSellerProduct(User seller, Scanner sc){
+		LOGGER.info("Delete product initiated. sellerId: " + seller.getUserId());
+
 		viewBySellerProducts(seller.getUserId());
 		
 		System.out.print("Enter Product ID to delete: ");
@@ -130,6 +149,7 @@ public class ProductService {
 		String confirm = sc.nextLine();
 		
 		if(!confirm.equalsIgnoreCase("yes")){
+			LOGGER.info("Product deletion cancelled by seller. sellerId: " + seller.getUserId());
 			System.out.println("Delete cancelled");
 			return;
 		}
@@ -137,17 +157,24 @@ public class ProductService {
 		boolean deleteProduct = productDAO.deleteProduct(productId, seller.getUserId());
 		
 		if(deleteProduct){
+			LOGGER.info("Product deleted successfully. productId: " + productId +
+	                ", sellerId: " + seller.getUserId());
 			System.out.println("Product Deleted Successfully");
 		}
 		else{
+			LOGGER.warning("Product deletion failed. productId: " + productId +
+	                   ", sellerId: " + seller.getUserId());
 			System.out.println("Product Deletion failed. Check the Product ID");
 		}
 	}
 	
 	public void showAllProductsForBuyer(){
+		LOGGER.info("Buyer requested all products list");
+
 		List<Product> products = productDAO.getAllProducts();
 		
 		if(products.isEmpty()){
+			LOGGER.info("No products available for buyers");
 			System.out.println("No products available");
 			return;
 		}
@@ -162,6 +189,7 @@ public class ProductService {
 	}
 	
 	public void viewProductDetails(Scanner sc){
+		LOGGER.info("View product details requested");
 		
 		System.out.print("\nEnter Product ID to view details: ");
 		int productId = sc.nextInt();
@@ -170,6 +198,7 @@ public class ProductService {
 		Product product = productDAO.getProductById(productId);
 		
 		if(product == null){
+			LOGGER.warning("Product not found. productId: " + productId);
 			System.out.println("Product not found");
 			return;
 		}
@@ -184,6 +213,7 @@ public class ProductService {
 	    List<Review> reviews = reviewDAO.getReviewsByProductId(productId);
 	    
 	    if(reviews.isEmpty()){
+	    	LOGGER.info("No reviews found for productId: " + productId);
 	    	System.out.println("No reviews yet.");
 	    }
 	    else{
@@ -196,6 +226,8 @@ public class ProductService {
 	}
 	
 	public void browseOrSearchProducts(Scanner sc) {
+		LOGGER.info("Browse/Search products initiated");
+
 
 	    System.out.println("\nChoose option:");
 	    System.out.println("1. Browse by Category");
@@ -218,11 +250,13 @@ public class ProductService {
 	        products = productDAO.searchProducts(keyword);
 
 	    } else {
+	    	LOGGER.warning("Invalid browse/search option selected");
 	        System.out.println("Invalid choice.");
 	        return;
 	    }
 
 	    if (products.isEmpty()) {
+	    	LOGGER.info("No products found for browse/search");
 	        System.out.println("No products found.");
 	        return;
 	    }

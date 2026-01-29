@@ -1,10 +1,15 @@
 package com.revshop.service;
 
 import java.util.Scanner;
+import java.util.logging.Logger;
+
 
 public class PaymentService {
+	private static final Logger LOGGER =
+	        Logger.getLogger(PaymentService.class.getName());
 	
 	public String processPayment(Scanner sc) {
+		LOGGER.info("Payment process started");
 
         System.out.println("\n--- Payment Options ---");
         System.out.println("1. Cash on Delivery (Default)");
@@ -15,6 +20,8 @@ public class PaymentService {
 
         int choice = sc.nextInt();
         sc.nextLine();
+        
+        LOGGER.info("Payment option selected. optionNumber: " + choice);
 
         String paymentMode = "COD"; // default
 
@@ -32,6 +39,7 @@ public class PaymentService {
             paymentMode = "NET_BANKING";
             break;
         default:
+        	LOGGER.warning("Invalid payment option selected. Defaulting to COD.");
             System.out.println("Invalid choice. Defaulting to COD.");
         }
 
@@ -39,9 +47,11 @@ public class PaymentService {
         String confirm = sc.nextLine();
 
         if (!confirm.equalsIgnoreCase("yes")) {
+        	LOGGER.info("Payment cancelled by user");
             return null; // payment cancelled
         }
 
+        LOGGER.info("Payment successful. Mode: " + paymentMode);
         System.out.println("Payment successful using " + paymentMode);
         return paymentMode;
     }
