@@ -69,7 +69,7 @@ public class RevShopApplication {
 
 	}
 
-	private static boolean askUserConsent(Scanner s) {
+	static boolean askUserConsent(Scanner s) {
 		System.out.println("\nDo you want to proceed (yes/no): ");
 		String input = s.nextLine();
 		return input.equalsIgnoreCase("yes") || input.equalsIgnoreCase("y");
