@@ -184,7 +184,8 @@ public class ProductService {
 	    for (Product p : products) {
 	        System.out.println("Product ID : " + p.getProductId()
 	                         + " | Name : " + p.getName()
-	                         + " | Discount Price: " + p.getDiscountPrice());
+	                         + " | Discount Price: " + p.getDiscountPrice()
+	                         + " | Quantity: " + p.getQuantity());
 	    }
 	}
 	

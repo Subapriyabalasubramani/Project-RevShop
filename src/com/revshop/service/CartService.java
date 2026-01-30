@@ -44,14 +44,14 @@ public class CartService {
                      "buyerId: " + buyer.getUserId() +
                      ", productId: " + productId +
                      ", qty: " + qty);
-            System.out.println("Invalid product or quantity");
+            System.out.println("\nCannot add to cart. The requested quantity is invalid or exceeds available stock.");
             return;
         }
 
         cartDAO.addToCart(cartId, productId, qty, product.getDiscountPrice());
         LOGGER.info("Product added to cart successfully. buyerId: " +
                 buyer.getUserId() + ", productId: " + productId);
-        System.out.println("Product added to cart successfully");
+        System.out.println("\nProduct added to cart successfully");
     }
 
     public void viewCart(User buyer) {

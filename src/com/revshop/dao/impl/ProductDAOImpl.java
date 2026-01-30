@@ -198,7 +198,7 @@ public class ProductDAOImpl implements ProductDAO {
 	public List<Product> getAllProducts() {
 		List<Product> products = new ArrayList<Product>();
 
-		String sql = "SELECT PRODUCT_ID, NAME, DISCOUNT_PRICE FROM PRODUCTS";
+		String sql = "SELECT PRODUCT_ID, NAME, DISCOUNT_PRICE, QUANTITY FROM PRODUCTS";
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -215,6 +215,7 @@ public class ProductDAOImpl implements ProductDAO {
 				product.setProductId(rs.getInt("PRODUCT_ID"));
 				product.setName(rs.getString("NAME"));
 				product.setDiscountPrice(rs.getDouble("DISCOUNT_PRICE"));
+				product.setQuantity(rs.getInt("QUANTITY"));
 
 				products.add(product);
 			}

@@ -6,6 +6,7 @@ import com.revshop.util.PasswordUtil;
 import com.revshop.dao.impl.UserDAOImpl;
 import com.revshop.dao.UserDAO;
 import java.util.logging.Logger;
+import com.revshop.util.ValidationUtil;
 
 public class UserService {
 	private static final Logger LOGGER = Logger.getLogger(UserService.class
@@ -19,28 +20,26 @@ public class UserService {
 
 		System.out.print("Enter Name: ");
 		String name = sc.nextLine();
+		if (!ValidationUtil.isValidName(name)) return;
 
 		System.out.print("Enter Email: ");
 		String email = sc.nextLine();
+		if (!ValidationUtil.isValidEmail(email)) return;
 
 		System.out.print("Enter Password: ");
 		String password = sc.nextLine();
-		
+		if (!ValidationUtil.isValidPassword(password)) return;
+
 		System.out.print("Set Hint (used for password recovery): ");
 		String securityAnswer = sc.nextLine();
 
 		String businessName = null;
-
 		if (role.equalsIgnoreCase("SELLER")) {
-			LOGGER.info("Registering a seller account");
-			System.out.print("Enter Business Name: ");
-			businessName = sc.nextLine();
+		    System.out.print("Enter Business Name: ");
+		    businessName = sc.nextLine();
+		    if (!ValidationUtil.isValidBusinessName(role, businessName)) return;
 		}
 		
-		if (!isValidRegistration(name, email, password, role, businessName)) {
-		    return;
-		}
-
 		String hashedPassword = PasswordUtil.hashPassword(password);
 		
 		User user = new User();
@@ -64,14 +63,11 @@ public class UserService {
 
 		System.out.print("Enter email: ");
 		String email = sc.nextLine();
+		if (!ValidationUtil.isValidEmail(email)) return null;
 
 		System.out.print("Enter password: ");
 		String password = sc.nextLine();
-		
-		if (email.trim().isEmpty() || password.trim().isEmpty()) {
-		    System.out.println("Email and password cannot be empty");
-		    return null;
-		}
+		if (!ValidationUtil.isValidPassword(password)) return null;
 
 		String hashedPassword = PasswordUtil.hashPassword(password);
 
@@ -88,53 +84,31 @@ public class UserService {
 		System.out.println("\nLogin Successful");
 		return user;
 	}
-	
-	private boolean isValidRegistration(
-	        String name, String email, String password,
-	        String role, String businessName) {
 
-	    if (name == null || name.trim().length() < 3) {
-	        System.out.println("Invalid name");
-	        return false;
-	    }
-
-	    if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-	        System.out.println("Invalid email format");
-	        return false;
-	    }
-
-	    if (password.length() < 6) {
-	        System.out.println("Password too short");
-	        return false;
-	    }
-
-	    if (role.equalsIgnoreCase("SELLER") &&
-	        (businessName == null || businessName.trim().isEmpty())) {
-	        System.out.println("Business name required for seller");
-	        return false;
-	    }
-
-	    return true;
-	}
 	
 	public void changePassword(User user, Scanner sc) {
 
 	    System.out.print("Enter old password: ");
 	    String oldPwd = sc.nextLine();
-
+	    
+	    if (oldPwd.length() < 6 || oldPwd == null) {
+	        System.out.println("Password must be at least 6 characters");
+	        return;
+	    }
+	    
 	    System.out.print("Enter new password: ");
 	    String newPwd = sc.nextLine();
-
+	    
+	    if (newPwd.length() < 6 || newPwd == null) {
+	        System.out.println("Password must be at least 6 characters");
+	        return;
+	    }
+	    
 	    System.out.print("Confirm new password: ");
 	    String confirmPwd = sc.nextLine();
 
 	    if (!newPwd.equals(confirmPwd)) {
 	        System.out.println("Passwords do not match");
-	        return;
-	    }
-
-	    if (newPwd.length() < 6) {
-	        System.out.println("Password must be at least 6 characters");
 	        return;
 	    }
 
@@ -158,19 +132,20 @@ public class UserService {
 	
 	public void forgotPassword(Scanner sc) {
 
-	    System.out.print("Enter registered email: ");
-	    String email = sc.nextLine();
+		System.out.print("Enter registered email: ");
+		String email = sc.nextLine();
+		if (!ValidationUtil.isValidEmail(email)) return;
 
-	    System.out.print("Enter security answer: ");
-	    String answer = sc.nextLine();
+		System.out.print("Enter security answer: ");
+		String answer = sc.nextLine();
+		if (answer.trim().isEmpty()) {
+		    System.out.println("Security answer cannot be empty");
+		    return;
+		}
 
-	    System.out.print("Enter new password: ");
-	    String newPwd = sc.nextLine();
-
-	    if (newPwd.length() < 6) {
-	        System.out.println("Password too short");
-	        return;
-	    }
+		System.out.print("Enter new password: ");
+		String newPwd = sc.nextLine();
+		if (!ValidationUtil.isValidPassword(newPwd)) return;
 
 	    boolean success = userDAO.resetPassword(
 	        email,
@@ -186,7 +161,4 @@ public class UserService {
 	        LOGGER.warning("Password reset failed for email: " + email);
 	    }
 	}
-
-
-
 }
