@@ -4,21 +4,15 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
-
-import com.revshop.model.Order;
 import com.revshop.model.CartItem;
 
 public class CartDAOImplTest {
-	
-	private static final int VALID_BUYER_ID = 5;
-    private static final int VALID_CART_ID = 1;
-    private static final int VALID_PRODUCT_ID = 22;
 
     @Test
     public void testGetCartIdByBuyer_pass() {
         CartDAOImpl dao = new CartDAOImpl();
 
-        int cartId = dao.getCartIdByBuyer(VALID_BUYER_ID);
+        int cartId = dao.getCartIdByBuyer(5);
 
         assertTrue(cartId > 0);
     }
@@ -27,7 +21,7 @@ public class CartDAOImplTest {
     public void testViewCart_pass() {
         CartDAOImpl dao = new CartDAOImpl();
 
-        List<CartItem> items = dao.viewCart(VALID_CART_ID);
+        List<CartItem> items = dao.viewCart(1);
 
         assertNotNull(items);
     }
@@ -37,7 +31,7 @@ public class CartDAOImplTest {
         CartDAOImpl dao = new CartDAOImpl();
 
         // Passes if no exception occurs
-        dao.addToCart(VALID_CART_ID, VALID_PRODUCT_ID, 1, 500);
+        dao.addToCart(1, 22, 1, 500);
     }
 
     @Test
@@ -45,7 +39,7 @@ public class CartDAOImplTest {
         CartDAOImpl dao = new CartDAOImpl();
 
         // Passes if no exception occurs
-        dao.updateCartItem(VALID_CART_ID, VALID_PRODUCT_ID, 2);
+        dao.updateCartItem(1, 22, 2);
     }
 
     @Test
@@ -53,7 +47,7 @@ public class CartDAOImplTest {
         CartDAOImpl dao = new CartDAOImpl();
 
         // Passes if no exception occurs
-        dao.removeFromCart(VALID_CART_ID, VALID_PRODUCT_ID);
+        dao.removeFromCart(1, 22);
     }
 
     @Test

@@ -17,6 +17,16 @@ public class ProductService {
 
 	private ProductDAO productDAO = new ProductDAOImpl();
 	private ReviewDAO reviewDAO = new ReviewDAOImpl();
+	
+	// for testing
+	void setProductDAO(ProductDAO productDAO) {
+	    this.productDAO = productDAO;
+	}
+
+	void setReviewDAO(ReviewDAO reviewDAO) {
+	    this.reviewDAO = reviewDAO;
+	}
+
 
 	public void addSellerProduct(User seller, Scanner sc) {
 		LOGGER.info("Add product initiated by sellerId: " + seller.getUserId());

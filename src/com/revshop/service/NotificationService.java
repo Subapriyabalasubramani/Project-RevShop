@@ -10,6 +10,12 @@ public class NotificationService {
 	        Logger.getLogger(NotificationService.class.getName());
 
 	private NotificationDAO notificationDAO = new NotificationDAOImpl();
+	
+	// for testing
+	void setNotificationDAO(NotificationDAO notificationDAO) {
+	    this.notificationDAO = notificationDAO;
+	}
+
 
     public void notifySeller(int sellerId, String message) {
     	LOGGER.info("Sending notification to sellerId: " + sellerId);

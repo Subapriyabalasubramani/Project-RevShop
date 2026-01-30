@@ -13,7 +13,36 @@ public class BuyerService {
 	FavoritesService favoritesService = new FavoritesService();
 	ReviewService reviewService = new ReviewService();
 	UserService userService = new UserService();
-	
+
+	// for testing
+	void setProductService(ProductService productService) {
+		this.productService = productService;
+	}
+
+	void setCartService(CartService cartService) {
+		this.cartService = cartService;
+	}
+
+	void setCheckoutService(CheckoutService checkoutService) {
+		this.checkoutService = checkoutService;
+	}
+
+	void setOrderService(OrderService orderService) {
+		this.orderService = orderService;
+	}
+
+	void setFavoritesService(FavoritesService favoritesService) {
+		this.favoritesService = favoritesService;
+	}
+
+	void setReviewService(ReviewService reviewService) {
+		this.reviewService = reviewService;
+	}
+
+	void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
 	private static final Logger LOGGER = Logger.getLogger(BuyerService.class
 			.getName());
 
@@ -93,7 +122,7 @@ public class BuyerService {
 				LOGGER.info("Buyer chose: Add Review");
 				reviewService.addReview(buyer, sc);
 				break;
-				
+
 			case 11:
 				LOGGER.info("Buyer chose: Change Password");
 				userService.changePassword(buyer, sc);

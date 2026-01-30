@@ -1,48 +1,72 @@
 package com.revshop.service;
 
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
-import org.junit.Test;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import com.revshop.dao.NotificationDAO;
+
+@RunWith(MockitoJUnitRunner.class)
 public class NotificationServiceTest {
 
-	private static final int VALID_SELLER_ID = 4;
+    @Mock
+    private NotificationDAO notificationDAO;
 
-	@Test
-	public void testNotificationServiceObjectCreation() {
-		NotificationService service = new NotificationService();
-		assertNotNull(service);
-	}
+    @InjectMocks
+    private NotificationService notificationService;
 
-	@Test
-	public void testNotifySeller_pass() {
-		NotificationService service = new NotificationService();
-
-		service.notifySeller(VALID_SELLER_ID, "JUnit test notification");
-	}
-
-	@Test
-	public void testHasUnreadNotifications_pass() {
-		NotificationService service = new NotificationService();
-
-		boolean result = service.hasUnreadNotifications(VALID_SELLER_ID);
-
-		assertNotNull(result);
-	}
-
-	@Test
-	public void testClearNotifications_pass() {
-		NotificationService service = new NotificationService();
-
-		service.clearNotifications(VALID_SELLER_ID);
-	}
-	
-	@Test
-    public void testHasUnreadNotifications_fail() {
-        NotificationService service = new NotificationService();
-
-        boolean result = service.hasUnreadNotifications(-1);
-
-        assertFalse(result);
+    @Before
+    public void setup() {
+        notificationService.setNotificationDAO(notificationDAO);
     }
 
+    @Test
+    public void testNotifySeller() {
+
+        notificationService.notifySeller(10, "New order received");
+
+        verify(notificationDAO)
+            .createNotification(10, "New order received");
+    }
+
+    @Test
+    public void testHasUnreadNotifications_true() {
+
+        when(notificationDAO.hasUnreadNotifications(10))
+            .thenReturn(true);
+
+        boolean result =
+            notificationService.hasUnreadNotifications(10);
+
+        assertTrue(result);
+        verify(notificationDAO).hasUnreadNotifications(10);
+    }
+
+    @Test
+    public void testHasUnreadNotifications_false() {
+
+        when(notificationDAO.hasUnreadNotifications(10))
+            .thenReturn(false);
+
+        boolean result =
+            notificationService.hasUnreadNotifications(10);
+
+        assertFalse(result);
+        verify(notificationDAO).hasUnreadNotifications(10);
+    }
+
+    @Test
+    public void testClearNotifications() {
+
+        notificationService.clearNotifications(10);
+
+        verify(notificationDAO)
+            .markNotificationsAsRead(10);
+    }
 }

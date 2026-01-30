@@ -8,8 +8,6 @@ import static org.junit.Assert.*;
 
 public class ProductDAOImplTest {
 
-	private static final int TEST_SELLER_ID = 1;
-
 	private Product createTestProduct(int sellerId) {
 		Product p = new Product();
 		p.setName("JUnit Product");
@@ -25,7 +23,7 @@ public class ProductDAOImplTest {
 	@Test
 	public void testAddProduct() {
 		ProductDAOImpl dao = new ProductDAOImpl();
-		Product product = createTestProduct(TEST_SELLER_ID);
+		Product product = createTestProduct(1);
 
 		// Passes if no exception occurs
 		dao.addProduct(product);
@@ -35,7 +33,7 @@ public class ProductDAOImplTest {
 	public void testGetProductsBySeller() {
 		ProductDAOImpl dao = new ProductDAOImpl();
 
-		List<Product> products = dao.getProductsBySeller(TEST_SELLER_ID);
+		List<Product> products = dao.getProductsBySeller(1);
 
 		assertNotNull(products);
 	}
@@ -100,7 +98,7 @@ public class ProductDAOImplTest {
 	public void testDeleteProduct_invalid() {
 	    ProductDAOImpl dao = new ProductDAOImpl();
 
-	    boolean deleted = dao.deleteProduct(-1, TEST_SELLER_ID);
+	    boolean deleted = dao.deleteProduct(-1, 1);
 
 	    assertFalse(deleted);
 	}

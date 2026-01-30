@@ -6,21 +6,19 @@ import java.util.List;
 import org.junit.Test;
 
 public class NotificationDAOImplTest {
-	
-	 private static final int VALID_SELLER_ID = 4;
 
 	    @Test
 	    public void testCreateNotification_pass() {
 	        NotificationDAOImpl dao = new NotificationDAOImpl();
 
-	        dao.createNotification(VALID_SELLER_ID, "JUnit test notification");
+	        dao.createNotification(4, "JUnit test notification");
 	    }
 
 	    @Test
 	    public void testHasUnreadNotifications_pass() {
 	        NotificationDAOImpl dao = new NotificationDAOImpl();
 
-	        boolean result = dao.hasUnreadNotifications(VALID_SELLER_ID);
+	        boolean result = dao.hasUnreadNotifications(4);
 
 	        assertNotNull(result);
 	    }
@@ -29,7 +27,7 @@ public class NotificationDAOImplTest {
 	    public void testGetUnreadNotifications_pass() {
 	        NotificationDAOImpl dao = new NotificationDAOImpl();
 
-	        List<String> messages = dao.getUnreadNotifications(VALID_SELLER_ID);
+	        List<String> messages = dao.getUnreadNotifications(4);
 
 	        assertNotNull(messages);
 	    }
@@ -39,7 +37,7 @@ public class NotificationDAOImplTest {
 	        NotificationDAOImpl dao = new NotificationDAOImpl();
 
 	        // Passes if no exception occurs
-	        dao.markNotificationsAsRead(VALID_SELLER_ID);
+	        dao.markNotificationsAsRead(4);
 	    }
 
 	    @Test

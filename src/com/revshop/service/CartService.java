@@ -18,6 +18,16 @@ public class CartService {
 
 	private CartDAO cartDAO = new CartDAOImpl();
     private ProductDAO productDAO = new ProductDAOImpl();
+    
+ // for testing
+    void setCartDAO(CartDAO cartDAO) {
+        this.cartDAO = cartDAO;
+    }
+
+    void setProductDAO(ProductDAO productDAO) {
+        this.productDAO = productDAO;
+    }
+
 
     public void addToCart(User buyer, Scanner sc) {
     	LOGGER.info("Add to cart initiated. buyerId: " + buyer.getUserId());

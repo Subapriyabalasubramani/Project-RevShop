@@ -14,6 +14,11 @@ public class UserService {
 
 	private UserDAO userDAO = new UserDAOImpl();
 
+    // ADDED THIS (for testing)
+    void setUserDAO(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
 	public void userRegistration(String role, Scanner sc) {
 
 		LOGGER.info("User registration started. Role: " + role);
@@ -114,6 +119,11 @@ public class UserService {
 
 	    String oldHashed = PasswordUtil.hashPassword(oldPwd);
 	    String newHashed = PasswordUtil.hashPassword(newPwd);
+	    
+	    if(oldHashed.equals(newHashed)){
+	    	System.out.println("New Password should be same as previous password");
+	        return;
+	    }
 
 	    boolean success = userDAO.changePassword(
 	        user.getUserId(),

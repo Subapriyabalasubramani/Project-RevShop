@@ -27,6 +27,28 @@ public class CheckoutService {
 	private NotificationService notificationService = new NotificationService();
 	private ProductDAO productDAO = new ProductDAOImpl();
 	private PaymentService paymentService = new PaymentService();
+	
+	// for testing
+	void setCartDAO(CartDAO cartDAO) {
+	    this.cartDAO = cartDAO;
+	}
+
+	void setOrderDAO(OrderDAO orderDAO) {
+	    this.orderDAO = orderDAO;
+	}
+
+	void setNotificationService(NotificationService notificationService) {
+	    this.notificationService = notificationService;
+	}
+
+	void setProductDAO(ProductDAO productDAO) {
+	    this.productDAO = productDAO;
+	}
+
+	void setPaymentService(PaymentService paymentService) {
+	    this.paymentService = paymentService;
+	}
+
 
 
 	public void checkout(User buyer, Scanner sc) {

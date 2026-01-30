@@ -9,22 +9,19 @@ import com.revshop.model.Favorites;
 
 public class FavoritesDAOImplTest {
 
-	private static final int VALID_BUYER_ID = 5;
-    private static final int VALID_PRODUCT_ID = 25;
-
     @Test
     public void testAddFavorite_pass() {
         FavoritesDAOImpl dao = new FavoritesDAOImpl();
 
         // Passes if no exception occurs
-        dao.addFavorite(VALID_BUYER_ID, VALID_PRODUCT_ID);
+        dao.addFavorite(5, 25);
     }
 
     @Test
     public void testGetFavoritesByBuyer_pass() {
         FavoritesDAOImpl dao = new FavoritesDAOImpl();
 
-        List<Favorites> favorites = dao.getFavoritesByBuyer(VALID_BUYER_ID);
+        List<Favorites> favorites = dao.getFavoritesByBuyer(5);
 
         assertNotNull(favorites);
         // may be empty or non-empty

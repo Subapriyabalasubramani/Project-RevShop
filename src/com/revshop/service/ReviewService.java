@@ -14,13 +14,24 @@ import java.util.logging.Logger;
 
 
 public class ReviewService {
+	
 	private static final Logger LOGGER =
 	        Logger.getLogger(ReviewService.class.getName());
+	
+	 private ReviewDAO reviewDAO = new ReviewDAOImpl();
+	    private OrderDAO orderDAO = new OrderDAOImpl();
+
+	    // setters for testing
+	    void setReviewDAO(ReviewDAO reviewDAO) {
+	        this.reviewDAO = reviewDAO;
+	    }
+
+	    void setOrderDAO(OrderDAO orderDAO) {
+	        this.orderDAO = orderDAO;
+	    }
 
 	public void viewReviewsForSellerProducts(int sellerId) {
 		LOGGER.info("Seller requested reviews for products. sellerId: " + sellerId);
-
-		ReviewDAO reviewDAO = new ReviewDAOImpl();
 		
 	    List<Review> reviews = reviewDAO.getReviewsBySeller(sellerId);
 
@@ -44,10 +55,6 @@ public class ReviewService {
 	
 	public void addReview(User buyer, Scanner sc) {
 		LOGGER.info("Add review initiated by buyerId: " + buyer.getUserId());
-
-
-	    OrderDAO orderDAO = new OrderDAOImpl();
-	    ReviewDAO reviewDAO = new ReviewDAOImpl();
 
 	    List<CartItem> purchasedItems =
 	        orderDAO.getPurchasedProducts(buyer.getUserId());

@@ -1,47 +1,60 @@
 package com.revshop.app;
 
-import org.junit.Test;
-import java.util.Scanner;
 import static org.junit.Assert.*;
+import java.util.Scanner;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class RevShopApplicationTest {
 
-	@Test
-	public void testApplicationCreation() {
-		RevShopApplication app = new RevShopApplication();
-		assertNotNull(app);
-	}
+    @BeforeClass
+    public static void beforeAll() {
+        System.out.println("Before all tests");
+    }
 
-	@Test
-	public void testAskUserConsent_yes() {
-		Scanner sc = new Scanner("yes\n");
-		boolean result = RevShopApplication.askUserConsent(sc);
-		sc.close();
-		assertTrue(result);
-	}
+    @Test
+    public void testAskUserConsent_yes() {
+        Scanner scanner = new Scanner("yes\n");
 
-	@Test
-	public void testAskUserConsent_y() {
-		Scanner sc = new Scanner("y\n");
-		boolean result = RevShopApplication.askUserConsent(sc);
-		sc.close();
-		assertTrue(result);
-	}
+        boolean result = RevShopApplication.askUserConsent(scanner);
 
-	@Test
-	public void testAskUserConsent_no() {
-		Scanner sc = new Scanner("no\n");
-		boolean result = RevShopApplication.askUserConsent(sc);
-		sc.close();
-		assertFalse(result);
-	}
+        assertTrue(result);
+        scanner.close();
+    }
 
-	@Test
-	public void testAskUserConsent_invalidInput() {
-		Scanner sc = new Scanner("abc\n");
-		boolean result = RevShopApplication.askUserConsent(sc);
-		sc.close();
-		assertFalse(result);
-	}
+    @Test
+    public void testAskUserConsent_y() {
+        Scanner scanner = new Scanner("y\n");
 
+        boolean result = RevShopApplication.askUserConsent(scanner);
+
+        assertTrue(result);
+        scanner.close();
+    }
+
+    @Test
+    public void testAskUserConsent_no() {
+        Scanner scanner = new Scanner("no\n");
+
+        boolean result = RevShopApplication.askUserConsent(scanner);
+
+        assertFalse(result);
+        scanner.close();
+    }
+
+    @Test
+    public void testAskUserConsent_invalidInput() {
+        Scanner scanner = new Scanner("abc\n");
+
+        boolean result = RevShopApplication.askUserConsent(scanner);
+
+        assertFalse(result);
+        scanner.close();
+    }
+
+    @AfterClass
+    public static void afterAll() {
+        System.out.println("After all tests");
+    }
 }

@@ -12,19 +12,13 @@ import com.revshop.model.CartItem;
 import com.revshop.model.Order;
 
 public class OrderDAOImplTest {
-	
-	private static final int VALID_BUYER_ID = 5;
-    private static final int VALID_SELLER_ID = 4;
-    private static final int VALID_PRODUCT_ID = 22;
-    private static final int VALID_ORDER_ID = 1;
-    private static final int VALID_CART_ID = 1;
     
     @Test
     public void testCreateOrder_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
         Order order = new Order();
-        order.setBuyerId(VALID_BUYER_ID);
+        order.setBuyerId(5);
         order.setShippingAddress("Test Address");
         order.setBillingAddress("Test Address");
         order.setTotalAmount(1000);
@@ -38,7 +32,7 @@ public class OrderDAOImplTest {
     public void testGetOrdersByBuyer_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
-        List<Order> orders = dao.getOrdersByBuyer(VALID_BUYER_ID);
+        List<Order> orders = dao.getOrdersByBuyer(5);
 
         assertNotNull(orders);
     }
@@ -47,7 +41,7 @@ public class OrderDAOImplTest {
     public void testGetOrderItems_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
-        List<CartItem> items = dao.getOrderItems(VALID_ORDER_ID);
+        List<CartItem> items = dao.getOrderItems(1);
 
         assertNotNull(items);
     }
@@ -56,7 +50,7 @@ public class OrderDAOImplTest {
     public void testHasOrdersForSeller_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
-        boolean result = dao.hasOrdersForSeller(VALID_SELLER_ID);
+        boolean result = dao.hasOrdersForSeller(4);
 
         assertTrue(result);
     }
@@ -65,7 +59,7 @@ public class OrderDAOImplTest {
     public void testGetOrdersForSeller_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
-        List<Order> orders = dao.getOrdersForSeller(VALID_SELLER_ID);
+        List<Order> orders = dao.getOrdersForSeller(4);
 
         assertNotNull(orders);
     }
@@ -74,7 +68,7 @@ public class OrderDAOImplTest {
     public void testGetPurchasedProducts_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
-        List<CartItem> items = dao.getPurchasedProducts(VALID_BUYER_ID);
+        List<CartItem> items = dao.getPurchasedProducts(5);
 
         assertNotNull(items);
     }
@@ -83,7 +77,7 @@ public class OrderDAOImplTest {
     public void testUpdatePaymentDetails_pass() {
         OrderDAOImpl dao = new OrderDAOImpl();
 
-        dao.updatePaymentDetails(VALID_ORDER_ID, "COD", "SUCCESS");
+        dao.updatePaymentDetails(1, "COD", "SUCCESS");
         // Passes if no exception
     }
 

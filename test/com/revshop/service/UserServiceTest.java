@@ -1,121 +1,126 @@
 package com.revshop.service;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Scanner;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import com.revshop.dao.UserDAO;
 import com.revshop.model.User;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
 
-    @Test
-    public void testUserRegistration_pass_buyer() {
-        UserService service = new UserService();
+	@Mock
+	private UserDAO userDAO; // MOCKED dependency
 
-        Scanner sc = new Scanner(
-            "JUnit User\n" +
-            "junituser@test.com\n" +
-            "test123\n"
-        );
+	@InjectMocks
+	private UserService userService; // real service, mocked DAO injected
 
-        // Passes if no exception occurs
-        service.userRegistration("BUYER", sc);
-    }
+	@Before
+	public void setup() {
+		userService.setUserDAO(userDAO);
+	}
 
-    @Test
-    public void testUserRegistration_pass_seller() {
-        UserService service = new UserService();
+	@Test
+	public void testUserRegistration_success_buyer() {
 
-        Scanner sc = new Scanner(
-            "JUnit Seller\n" +
-            "junitseller@test.com\n" +
-            "test123\n" +
-            "JUnit Business\n"
-        );
+		Scanner sc = new Scanner("JUnit User\n" + "junit@gmail.com\n"
+				+ "test123\n" + "hint\n");
 
-        service.userRegistration("SELLER", sc);
-    }
+		userService.userRegistration("BUYER", sc);
 
-    @Test
-    public void testUserRegistration_fail_invalidName() {
-        UserService service = new UserService();
+		// verify DAO interaction
+		verify(userDAO, times(1)).registerUser(any(User.class));
+	}
 
-        Scanner sc = new Scanner(
-            "Jo\n" +                        // invalid name
-            "test@mail.com\n" +
-            "test123\n"
-        );
+	@Test
+	public void testUserRegistration_fail_invalidEmail() {
 
-        service.userRegistration("BUYER", sc);
-    }
+		Scanner sc = new Scanner("JUnit User\n" + "invalid\n" + "test123\n");
 
-    @Test
-    public void testUserRegistration_fail_invalidEmail() {
-        UserService service = new UserService();
+		userService.userRegistration("BUYER", sc);
 
-        Scanner sc = new Scanner(
-            "JUnit User\n" +
-            "invalidEmail\n" +              // invalid email
-            "test123\n"
-        );
+		// DAO should NOT be called
+		verify(userDAO, never()).registerUser(any(User.class));
+	}
 
-        service.userRegistration("BUYER", sc);
-    }
+	@Test
+	public void testLogin_success() {
 
-    @Test
-    public void testUserRegistration_fail_shortPassword() {
-        UserService service = new UserService();
+		Scanner sc = new Scanner("test@gmail.com\n" + "test123\n");
 
-        Scanner sc = new Scanner(
-            "JUnit User\n" +
-            "test@mail.com\n" +
-            "123\n"                         // short password
-        );
+		User mockUser = new User();
+		mockUser.setRole("BUYER");
 
-        service.userRegistration("BUYER", sc);
-    }
+		when(userDAO.login(anyString(), anyString())).thenReturn(mockUser);
 
-    @Test
-    public void testSellerRegistration_fail_missingBusinessName() {
-        UserService service = new UserService();
+		User user = userService.login(sc);
 
-        Scanner sc = new Scanner(
-            "JUnit Seller\n" +
-            "seller@mail.com\n" +
-            "test123\n" +
-            "\n"                            // missing business name
-        );
+		assertNotNull(user);
+		verify(userDAO).login(anyString(), anyString());
+	}
 
-        service.userRegistration("SELLER", sc);
-    }
+	@Test
+	public void testLogin_fail_invalidCredentials() {
 
-    @Test
-    public void testLogin_fail_invalidCredentials() {
-        UserService service = new UserService();
+		Scanner sc = new Scanner("test@gmail.com\n" + "wrongpass\n");
 
-        Scanner sc = new Scanner(
-            "invalid@test.com\n" +
-            "wrongpass\n"
-        );
+		when(userDAO.login(anyString(), anyString())).thenReturn(null);
 
-        User user = service.login(sc);
+		User user = userService.login(sc);
 
-        assertNull(user);
-    }
+		assertNull(user);
+		verify(userDAO).login(anyString(), anyString());
+	}
 
-    @Test
-    public void testLogin_fail_emptyEmailPassword() {
-        UserService service = new UserService();
+	@Test
+	public void testChangePassword_success() {
 
-        Scanner sc = new Scanner(
-            "\n" +
-            "\n"
-        );
+		User user = new User();
+		user.setUserId(1);
 
-        User user = service.login(sc);
+		Scanner sc = new Scanner("oldpass\n" + "newpass\n" + "newpass\n");
 
-        assertNull(user);
-    }
+		when(userDAO.changePassword(anyInt(), anyString(), anyString()))
+				.thenReturn(true);
+
+		userService.changePassword(user, sc);
+
+		verify(userDAO).changePassword(anyInt(), anyString(), anyString());
+	}
+
+	@Test
+	public void testChangePassword_fail_mismatch() {
+
+		User user = new User();
+		user.setUserId(1);
+
+		Scanner sc = new Scanner("oldpass\n" + "newpass\n" + "wrong\n");
+
+		userService.changePassword(user, sc);
+
+		verify(userDAO, never()).changePassword(anyInt(), anyString(),
+				anyString());
+	}
+
+	@Test
+	public void testForgotPassword_success() {
+
+		Scanner sc = new Scanner("test@gmail.com\n" + "hint\n" + "newpass\n");
+
+		when(userDAO.resetPassword(anyString(), anyString(), anyString()))
+				.thenReturn(true);
+
+		userService.forgotPassword(sc);
+
+		verify(userDAO).resetPassword(anyString(), anyString(), anyString());
+	}
 }

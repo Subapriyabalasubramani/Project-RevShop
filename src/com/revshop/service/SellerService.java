@@ -5,9 +5,9 @@ import com.revshop.model.User;
 import java.util.logging.Logger;
 
 public class SellerService {
-	
-	private static final Logger LOGGER =
-	        Logger.getLogger(SellerService.class.getName());
+
+	private static final Logger LOGGER = Logger.getLogger(SellerService.class
+			.getName());
 
 	ProductService productService = new ProductService();
 	OrderService orderService = new OrderService();
@@ -15,12 +15,33 @@ public class SellerService {
 	ReviewService reviewService = new ReviewService();
 	UserService userService = new UserService();
 
+	void setProductService(ProductService productService) {
+		this.productService = productService;
+	}
+
+	void setOrderService(OrderService orderService) {
+		this.orderService = orderService;
+	}
+
+	void setNotificationService(NotificationService notificationService) {
+		this.notificationService = notificationService;
+	}
+
+	void setReviewService(ReviewService reviewService) {
+		this.reviewService = reviewService;
+	}
+
+	void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
 	public void showSellerMenu(User seller, Scanner sc) {
 		LOGGER.info("Seller menu started for sellerId: " + seller.getUserId());
-		
+
 		if (notificationService.hasUnreadNotifications(seller.getUserId())) {
-			LOGGER.info("Seller has unread notifications. sellerId: " + seller.getUserId());
-		    System.out.println("\n You have new notifications!");
+			LOGGER.info("Seller has unread notifications. sellerId: "
+					+ seller.getUserId());
+			System.out.println("\n You have new notifications!");
 		}
 
 		boolean logout = false;
@@ -39,9 +60,9 @@ public class SellerService {
 
 			int choice = sc.nextInt();
 			sc.nextLine();
-			
-			LOGGER.info("Seller selected menu option: " + choice +
-		            " sellerId: " + seller.getUserId());
+
+			LOGGER.info("Seller selected menu option: " + choice
+					+ " sellerId: " + seller.getUserId());
 
 			switch (choice) {
 			case 1:
@@ -65,25 +86,26 @@ public class SellerService {
 				orderService.viewOrdersForSeller(seller, sc);
 				notificationService.clearNotifications(seller.getUserId());
 				break;
-				
+
 			case 6:
 				LOGGER.info("Seller chose: View Reviews");
-			    reviewService.viewReviewsForSellerProducts(seller.getUserId());
-			    break;
-			    
+				reviewService.viewReviewsForSellerProducts(seller.getUserId());
+				break;
+
 			case 7:
 				LOGGER.info("Seller chose: Change Password");
 				userService.changePassword(seller, sc);
 				break;
 
 			case 8:
-				LOGGER.info("Seller logged out. sellerId: " + seller.getUserId());
+				LOGGER.info("Seller logged out. sellerId: "
+						+ seller.getUserId());
 				System.out.println("Logged out successfully");
 				logout = true;
 				break;
 			default:
-				LOGGER.warning("Invalid menu choice entered by seller: " + choice +
-		                   " sellerId: " + seller.getUserId());
+				LOGGER.warning("Invalid menu choice entered by seller: "
+						+ choice + " sellerId: " + seller.getUserId());
 				System.out.println("Invalid choice. Try again");
 				break;
 			}

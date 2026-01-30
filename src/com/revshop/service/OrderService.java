@@ -15,6 +15,11 @@ public class OrderService {
 	        Logger.getLogger(OrderService.class.getName());
 
     private OrderDAO orderDAO = new OrderDAOImpl();
+ 
+    void setOrderDAO(OrderDAO orderDAO) {
+        this.orderDAO = orderDAO;
+    }
+
 
     public void viewOrderHistory(User buyer, Scanner sc) {
     	LOGGER.info("Order history requested. buyerId: " + buyer.getUserId());

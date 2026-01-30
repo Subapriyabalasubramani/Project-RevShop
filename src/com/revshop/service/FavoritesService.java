@@ -16,11 +16,19 @@ public class FavoritesService {
 
 
 	private FavoritesDAO favoriteDAO = new FavoritesDAOImpl();
+	ProductService productService = new ProductService();
+	
+    void setFavoriteDAO(FavoritesDAO favoriteDAO) {
+        this.favoriteDAO = favoriteDAO;
+    }
+
+    void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
 
 	public void addToFavorites(User buyer, Scanner sc) {
 		LOGGER.info("Add to favorites initiated. buyerId: " + buyer.getUserId());
 		
-		ProductService productService = new ProductService();
 		productService.showAllProductsForBuyer();
 
 		System.out.print("\nEnter Product ID to favorite: ");

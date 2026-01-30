@@ -1,36 +1,82 @@
 package com.revshop.service;
 
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import java.util.*;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import com.revshop.dao.FavoritesDAO;
+import com.revshop.model.Favorites;
 import com.revshop.model.User;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FavoritesServiceTest {
 
-	private static final int VALID_BUYER_ID = 6;
+    @Mock
+    private FavoritesDAO favoritesDAO;
 
-	@Test
-	public void testFavoritesServiceObjectCreation() {
-		FavoritesService service = new FavoritesService();
-		assertNotNull(service);
-	}
+    @Mock
+    private ProductService productService;
 
-	@Test
-	public void testViewFavorites_pass() {
-		FavoritesService service = new FavoritesService();
+    @InjectMocks
+    private FavoritesService favoritesService;
 
-		User buyer = new User();
-		buyer.setUserId(VALID_BUYER_ID);
+    private User buyer;
 
-		service.viewFavorites(buyer);
-	}
+    @Before
+    public void setup() {
+        buyer = new User();
+        buyer.setUserId(7);
 
-	@Test
-	public void testViewFavorites_fail() {
-		FavoritesService service = new FavoritesService();
+        favoritesService.setFavoriteDAO(favoritesDAO);
+        favoritesService.setProductService(productService);
+    }
 
-		User buyer = new User();
-		buyer.setUserId(-1);
+    @Test
+    public void testAddToFavorites_success() {
 
-		service.viewFavorites(buyer);
-	}
+        when(favoritesDAO.getFavoritesByBuyer(7))
+            .thenReturn(Collections.<Favorites>emptyList());
+
+        Scanner sc = new Scanner(
+            "101\n"
+        );
+
+        favoritesService.addToFavorites(buyer, sc);
+
+        verify(productService).showAllProductsForBuyer();
+        verify(favoritesDAO).addFavorite(7, 101);
+        verify(favoritesDAO).getFavoritesByBuyer(7);
+    }
+
+    @Test
+    public void testViewFavorites_noFavorites() {
+
+        when(favoritesDAO.getFavoritesByBuyer(7))
+            .thenReturn(Collections.<Favorites>emptyList());
+
+        favoritesService.viewFavorites(buyer);
+
+        verify(favoritesDAO).getFavoritesByBuyer(7);
+    }
+
+    @Test
+    public void testViewFavorites_withFavorites() {
+
+        Favorites f = new Favorites();
+        f.setProductId(101);
+        f.setProductName("Phone");
+
+        when(favoritesDAO.getFavoritesByBuyer(7))
+            .thenReturn(Arrays.asList(f));
+
+        favoritesService.viewFavorites(buyer);
+
+        verify(favoritesDAO).getFavoritesByBuyer(7);
+    }
 }
