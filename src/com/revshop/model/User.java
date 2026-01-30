@@ -8,6 +8,7 @@ public class User {
 	private String password;
 	private String role;
 	private String businessName;
+	private String securityAnswer;
 	
 	public int getUserId(){
 		return userId;
@@ -55,6 +56,14 @@ public class User {
 	
 	public void setBusinessName(String businessName){
 		this.businessName = businessName;
+	}
+	
+	public String getSecurityAnswer(){
+		return securityAnswer;
+	}
+	
+	public void setSecurtiyAnswer(String securityAnswer){
+		this.securityAnswer = securityAnswer;
 	}
 
 }

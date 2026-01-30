@@ -12,6 +12,8 @@ public class BuyerService {
 	OrderService orderService = new OrderService();
 	FavoritesService favoritesService = new FavoritesService();
 	ReviewService reviewService = new ReviewService();
+	UserService userService = new UserService();
+	
 	private static final Logger LOGGER = Logger.getLogger(BuyerService.class
 			.getName());
 
@@ -32,7 +34,8 @@ public class BuyerService {
 			System.out.println("8. Order History");
 			System.out.println("9. Save to favorties");
 			System.out.println("10. Review & Ratings");
-			System.out.println("11. Logout");
+			System.out.println("11. Change Password");
+			System.out.println("12. Logout");
 			System.out.print("\nEnter choice: ");
 
 			int choice = sc.nextInt();
@@ -90,8 +93,13 @@ public class BuyerService {
 				LOGGER.info("Buyer chose: Add Review");
 				reviewService.addReview(buyer, sc);
 				break;
-
+				
 			case 11:
+				LOGGER.info("Buyer chose: Change Password");
+				userService.changePassword(buyer, sc);
+				break;
+
+			case 12:
 				LOGGER.info("Buyer logged out. buyerId: " + buyer.getUserId());
 				logout = true;
 				System.out.println("Logged out successfully");

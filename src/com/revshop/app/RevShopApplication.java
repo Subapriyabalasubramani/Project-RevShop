@@ -20,7 +20,8 @@ public class RevShopApplication {
 			System.out.println("1. Register as Buyer");
 			System.out.println("2. Register as Seller");
 			System.out.println("3. Login");
-			System.out.println("4. Exit");
+			System.out.println("4. Forgot Password");
+			System.out.println("5. Exit");
 			System.out.println("--------------------------");
 			System.out.print("Enter your choice: ");
 
@@ -57,7 +58,12 @@ public class RevShopApplication {
 					}
 				}
 				break;
+				
 			case 4:
+				userService.forgotPassword(sc);
+				break;
+				
+			case 5:
 				exit = true;
 				System.out.println("\nThank you for using RevShop");
 				break;

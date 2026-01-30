@@ -24,7 +24,10 @@ public class UserService {
 		String email = sc.nextLine();
 
 		System.out.print("Enter Password: ");
-		String password = sc.nextLine();	
+		String password = sc.nextLine();
+		
+		System.out.print("Set Hint (used for password recovery): ");
+		String securityAnswer = sc.nextLine();
 
 		String businessName = null;
 
@@ -46,6 +49,8 @@ public class UserService {
 		user.setPassword(hashedPassword);
 		user.setRole(role);
 		user.setBusinessName(businessName);
+		user.setSecurtiyAnswer(PasswordUtil.hashPassword(securityAnswer));
+
 
 		userDAO.registerUser(user);
 
@@ -111,5 +116,77 @@ public class UserService {
 
 	    return true;
 	}
+	
+	public void changePassword(User user, Scanner sc) {
+
+	    System.out.print("Enter old password: ");
+	    String oldPwd = sc.nextLine();
+
+	    System.out.print("Enter new password: ");
+	    String newPwd = sc.nextLine();
+
+	    System.out.print("Confirm new password: ");
+	    String confirmPwd = sc.nextLine();
+
+	    if (!newPwd.equals(confirmPwd)) {
+	        System.out.println("Passwords do not match");
+	        return;
+	    }
+
+	    if (newPwd.length() < 6) {
+	        System.out.println("Password must be at least 6 characters");
+	        return;
+	    }
+
+	    String oldHashed = PasswordUtil.hashPassword(oldPwd);
+	    String newHashed = PasswordUtil.hashPassword(newPwd);
+
+	    boolean success = userDAO.changePassword(
+	        user.getUserId(),
+	        oldHashed,
+	        newHashed
+	    );
+
+	    if (success) {
+	        System.out.println("Password changed successfully");
+	        LOGGER.info("Password changed for userId: " + user.getUserId());
+	    } else {
+	        System.out.println("Old password is incorrect");
+	        LOGGER.warning("Password change failed for userId: " + user.getUserId());
+	    }
+	}
+	
+	public void forgotPassword(Scanner sc) {
+
+	    System.out.print("Enter registered email: ");
+	    String email = sc.nextLine();
+
+	    System.out.print("Enter security answer: ");
+	    String answer = sc.nextLine();
+
+	    System.out.print("Enter new password: ");
+	    String newPwd = sc.nextLine();
+
+	    if (newPwd.length() < 6) {
+	        System.out.println("Password too short");
+	        return;
+	    }
+
+	    boolean success = userDAO.resetPassword(
+	        email,
+	        PasswordUtil.hashPassword(answer),
+	        PasswordUtil.hashPassword(newPwd)
+	    );
+
+	    if (success) {
+	        System.out.println("\nPassword reset successful");
+	        LOGGER.info("Password reset for email: " + email);
+	    } else {
+	        System.out.println("\nInvalid details. Password reset failed");
+	        LOGGER.warning("Password reset failed for email: " + email);
+	    }
+	}
+
+
 
 }

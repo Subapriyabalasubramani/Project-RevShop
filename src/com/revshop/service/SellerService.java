@@ -13,6 +13,7 @@ public class SellerService {
 	OrderService orderService = new OrderService();
 	NotificationService notificationService = new NotificationService();
 	ReviewService reviewService = new ReviewService();
+	UserService userService = new UserService();
 
 	public void showSellerMenu(User seller, Scanner sc) {
 		LOGGER.info("Seller menu started for sellerId: " + seller.getUserId());
@@ -32,7 +33,8 @@ public class SellerService {
 			System.out.println("4. Delete Product");
 			System.out.println("5. View my Orders");
 			System.out.println("6. View Reviews and Ratings");
-			System.out.println("7. Logout");
+			System.out.println("7. Change Password");
+			System.out.println("8. Logout");
 			System.out.print("\nEnter a choice: ");
 
 			int choice = sc.nextInt();
@@ -68,8 +70,13 @@ public class SellerService {
 				LOGGER.info("Seller chose: View Reviews");
 			    reviewService.viewReviewsForSellerProducts(seller.getUserId());
 			    break;
-
+			    
 			case 7:
+				LOGGER.info("Seller chose: Change Password");
+				userService.changePassword(seller, sc);
+				break;
+
+			case 8:
 				LOGGER.info("Seller logged out. sellerId: " + seller.getUserId());
 				System.out.println("Logged out successfully");
 				logout = true;
