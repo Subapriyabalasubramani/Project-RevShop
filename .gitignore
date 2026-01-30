@@ -8,7 +8,5 @@ src/com/revshop/config/DatabaseConfig.java
 bin/
 
 # Log files
-*.log
-*.log.*
-*.lck
+logs/
 

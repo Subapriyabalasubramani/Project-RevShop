@@ -6,14 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import com.revshop.config.DBConnection;
 import com.revshop.dao.NotificationDAO;
 
 public class NotificationDAOImpl implements NotificationDAO {
-	private static final Logger LOGGER = Logger
-			.getLogger(NotificationDAOImpl.class.getName());
+	private static final Logger logger =
+            Logger.getLogger(NotificationDAOImpl.class);
 
 	@Override
 	public void createNotification(int sellerId, String message) {
@@ -32,9 +32,11 @@ public class NotificationDAOImpl implements NotificationDAO {
 			ps.setInt(1, sellerId);
 			ps.setString(2, message);
 			ps.executeUpdate();
+			
+			logger.info("Notification created for sellerId=" + sellerId);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error creating notification for sellerId: "
+			logger.error("Error creating notification for sellerId: "
 					+ sellerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -44,7 +46,7 @@ public class NotificationDAOImpl implements NotificationDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in createNotification: "
+				logger.error("Error closing DB resources in createNotification: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -70,9 +72,10 @@ public class NotificationDAOImpl implements NotificationDAO {
 			if (rs.next()) {
 				return rs.getInt(1) > 0;
 			}
+			logger.info("Unread notifications check for sellerId");
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error checking unread notifications for sellerId: "
+			logger.error("Error checking unread notifications for sellerId: "
 					+ sellerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -84,7 +87,7 @@ public class NotificationDAOImpl implements NotificationDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in hasUnreadNotifications: "
+				logger.error("Error closing DB resources in hasUnreadNotifications: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -115,9 +118,12 @@ public class NotificationDAOImpl implements NotificationDAO {
 			while (rs.next()) {
 				messages.add(rs.getString("MESSAGE"));
 			}
+			
+			logger.info("Fetched unread notifications for sellerId="
+                    + sellerId + ", count=" + messages.size());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching unread notifications for sellerId: "
+			logger.error("Error fetching unread notifications for sellerId: "
 					+ sellerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -129,7 +135,7 @@ public class NotificationDAOImpl implements NotificationDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getUnreadNotifications: "
+				logger.error("Error closing DB resources in getUnreadNotifications: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -153,9 +159,11 @@ public class NotificationDAOImpl implements NotificationDAO {
 
 			ps.setInt(1, sellerId);
 			ps.executeUpdate();
+			
+			logger.info("Marked notifications as read for sellerId");
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error marking notifications as read for sellerId: "
+			logger.error("Error marking notifications as read for sellerId: "
 					+ sellerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -165,7 +173,7 @@ public class NotificationDAOImpl implements NotificationDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in markNotificationsAsRead: "
+				logger.error("Error closing DB resources in markNotificationsAsRead: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}

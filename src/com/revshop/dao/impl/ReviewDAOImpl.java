@@ -3,7 +3,7 @@ package com.revshop.dao.impl;
 import com.revshop.model.Review;
 import com.revshop.dao.ReviewDAO;
 import com.revshop.config.DBConnection;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.sql.ResultSet;
 
 public class ReviewDAOImpl implements ReviewDAO {
-	private static final Logger LOGGER = Logger.getLogger(ReviewDAOImpl.class
-			.getName());
+	 private static final Logger logger =
+	            Logger.getLogger(ReviewDAOImpl.class);
 
 	@Override
 	public List<Review> getReviewsByProductId(int productId) {
@@ -41,8 +41,10 @@ public class ReviewDAOImpl implements ReviewDAO {
 				review.setComment(rs.getString("REVIEW_COMMENT"));
 				reviews.add(review);
 			}
+			logger.info("Fetched reviews for productId="
+                    + productId + ", count=" + reviews.size());
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching reviews for productId: " + productId
+			logger.error("Error fetching reviews for productId: " + productId
 					+ " | " + e.getMessage());
 			System.out.println("Error fetching reviews");
 		} finally {
@@ -54,7 +56,7 @@ public class ReviewDAOImpl implements ReviewDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getReviewsByProductId: "
+				logger.error("Error closing DB resources in getReviewsByProductId: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -92,9 +94,11 @@ public class ReviewDAOImpl implements ReviewDAO {
 				review.setComment(rs.getString("REVIEW_COMMENT"));
 				reviews.add(review);
 			}
+			logger.info("Fetched reviews for sellerId="
+                    + sellerId + ", count=" + reviews.size());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching reviews for sellerId: " + sellerId
+			logger.error("Error fetching reviews for sellerId: " + sellerId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -107,7 +111,7 @@ public class ReviewDAOImpl implements ReviewDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getReviewsBySeller: "
+				logger.error("Error closing DB resources in getReviewsBySeller: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -139,7 +143,7 @@ public class ReviewDAOImpl implements ReviewDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error checking purchase history. buyerId: "
+			logger.error("Error checking purchase history. buyerId: "
 					+ buyerId + ", productId: " + productId + " | "
 					+ e.getMessage());
 			e.printStackTrace();
@@ -152,7 +156,7 @@ public class ReviewDAOImpl implements ReviewDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in hasBuyerPurchasedProduct: "
+				logger.error("Error closing DB resources in hasBuyerPurchasedProduct: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -179,12 +183,12 @@ public class ReviewDAOImpl implements ReviewDAO {
 			ps.setString(4, comment);
 			ps.executeUpdate();
 
-			LOGGER.info("Review added successfully. buyerId: " + buyerId
+			logger.info("Review added successfully. buyerId: " + buyerId
 					+ ", productId: " + productId);
 			System.out.println("Review submitted successfully");
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error adding review. buyerId: " + buyerId
+			logger.error("Error adding review. buyerId: " + buyerId
 					+ ", productId: " + productId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -194,7 +198,7 @@ public class ReviewDAOImpl implements ReviewDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in addReview: "
+				logger.error("Error closing DB resources in addReview: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}

@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import com.revshop.config.DBConnection;
 import com.revshop.dao.UserDAO;
 import com.revshop.model.User;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class UserDAOImpl implements UserDAO {
-	private static final Logger LOGGER = Logger.getLogger(UserDAOImpl.class
-			.getName());
+	private static final Logger logger =
+            Logger.getLogger(UserDAOImpl.class);
 
 	@Override
 	public void registerUser(User user) {
@@ -31,11 +31,11 @@ public class UserDAOImpl implements UserDAO {
 			ps.setString(6, user.getSecurityAnswer());
 
 			ps.executeUpdate(); // used to execute the insert statement
-			LOGGER.info("User registered successfully. Email: "
+			logger.info("User registered successfully. Email: "
 					+ user.getEmail());
 			System.out.println("Registration successful!");
 		} catch (SQLException e) {
-			LOGGER.severe("Error while registering user. Email: "
+			logger.error("Error while registering user. Email: "
 					+ user.getEmail() + " | " + e.getMessage());
 			System.out.println(e.getMessage());
 		} finally {
@@ -45,7 +45,7 @@ public class UserDAOImpl implements UserDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in registerUser: "
+				logger.error("Error closing DB resources in registerUser: "
 						+ e.getMessage());
 			}
 		}
@@ -75,12 +75,12 @@ public class UserDAOImpl implements UserDAO {
 				user.setRole(rs.getString("ROLE"));
 				user.setBusinessName(rs.getString("BUSINESSNAME"));
 
-				LOGGER.info("User login successful. Email: " + email);
+				logger.info("User login successful. Email: " + email);
 
 				return user;
 			}
 		} catch (SQLException e) {
-			LOGGER.severe("Login failed due to DB error. Email: " + email
+			logger.error("Login failed due to DB error. Email: " + email
 					+ " | " + e.getMessage());
 			System.out.println("Login error");
 			e.printStackTrace();
@@ -91,7 +91,7 @@ public class UserDAOImpl implements UserDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in login: "
+				logger.error("Error closing DB resources in login: "
 						+ e.getMessage());
 			}
 		}
@@ -141,6 +141,7 @@ public class UserDAOImpl implements UserDAO {
 	        return true;
 
 	    } catch (SQLException e) {
+	    	logger.error("Error changing password. userId=" + userId, e);
 	        e.printStackTrace();
 	    } finally {
 	        try {
@@ -148,6 +149,8 @@ public class UserDAOImpl implements UserDAO {
 	            if (ps != null) ps.close();
 	            if (con != null) con.close();
 	        } catch (SQLException e) {
+	        	logger.error("Error closing DB resources in login: "
+						+ e.getMessage());
 	            e.printStackTrace();
 	        }
 	    }
@@ -190,9 +193,11 @@ public class UserDAOImpl implements UserDAO {
 	        ps.setInt(2, userId);
 	        ps.executeUpdate();
 
+	        logger.info("Password reset successful. email=" + email);
 	        return true;
 
 	    } catch (SQLException e) {
+	    	logger.error("Error resetting password. email=" + email, e);
 	        e.printStackTrace();
 	    } finally {
 	        try {
@@ -200,6 +205,8 @@ public class UserDAOImpl implements UserDAO {
 	            if (ps != null) ps.close();
 	            if (con != null) con.close();
 	        } catch (SQLException e) {
+	        	logger.error("Error closing DB resources in login: "
+						+ e.getMessage());
 	            e.printStackTrace();
 	        }
 	    }

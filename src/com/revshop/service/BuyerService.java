@@ -2,9 +2,12 @@ package com.revshop.service;
 
 import java.util.Scanner;
 import com.revshop.model.User;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class BuyerService {
+	
+	private static final Logger logger =
+            Logger.getLogger(BuyerService.class);
 
 	ProductService productService = new ProductService();
 	CartService cartService = new CartService();
@@ -43,11 +46,8 @@ public class BuyerService {
 		this.userService = userService;
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(BuyerService.class
-			.getName());
-
 	public void showBuyerMenu(User buyer, Scanner sc) {
-		LOGGER.info("Buyer menu started for buyerId: " + buyer.getUserId());
+		logger.info("Buyer menu started for buyerId: " + buyer.getUserId());
 
 		boolean logout = false;
 
@@ -69,73 +69,73 @@ public class BuyerService {
 
 			int choice = sc.nextInt();
 			sc.nextLine();
-			LOGGER.info("Buyer selected menu option: " + choice + " buyerId: "
+			logger.info("Buyer selected menu option: " + choice + " buyerId: "
 					+ buyer.getUserId());
 
 			switch (choice) {
 			case 1:
-				LOGGER.info("Buyer chose: View Product Details");
+				logger.info("Buyer chose: View Product Details");
 				productService.showAllProductsForBuyer();
 				productService.viewProductDetails(sc);
 				break;
 			case 2:
-				LOGGER.info("Buyer chose: Browse/Search Products");
+				logger.info("Buyer chose: Browse/Search Products");
 				productService.browseOrSearchProducts(sc);
 				break;
 			case 3:
-				LOGGER.info("Buyer chose: Add to Cart");
+				logger.info("Buyer chose: Add to Cart");
 				productService.showAllProductsForBuyer();
 				cartService.addToCart(buyer, sc);
 				break;
 
 			case 4:
-				LOGGER.info("Buyer chose: View Cart");
+				logger.info("Buyer chose: View Cart");
 				cartService.viewCart(buyer);
 				break;
 
 			case 5:
-				LOGGER.info("Buyer chose: Update Cart");
+				logger.info("Buyer chose: Update Cart");
 				cartService.updateCart(buyer, sc);
 				break;
 
 			case 6:
-				LOGGER.info("Buyer chose: Remove from Cart");
+				logger.info("Buyer chose: Remove from Cart");
 				cartService.removeFromCart(buyer, sc);
 				break;
 
 			case 7:
-				LOGGER.info("Buyer chose: Checkout");
+				logger.info("Buyer chose: Checkout");
 				checkoutService.checkout(buyer, sc);
 				break;
 
 			case 8:
-				LOGGER.info("Buyer chose: View Order History");
+				logger.info("Buyer chose: View Order History");
 				orderService.viewOrderHistory(buyer, sc);
 				break;
 
 			case 9:
-				LOGGER.info("Buyer chose: Add to Favorites");
+				logger.info("Buyer chose: Add to Favorites");
 				favoritesService.addToFavorites(buyer, sc);
 				break;
 
 			case 10:
-				LOGGER.info("Buyer chose: Add Review");
+				logger.info("Buyer chose: Add Review");
 				reviewService.addReview(buyer, sc);
 				break;
 
 			case 11:
-				LOGGER.info("Buyer chose: Change Password");
+				logger.info("Buyer chose: Change Password");
 				userService.changePassword(buyer, sc);
 				break;
 
 			case 12:
-				LOGGER.info("Buyer logged out. buyerId: " + buyer.getUserId());
+				logger.info("Buyer logged out. buyerId: " + buyer.getUserId());
 				logout = true;
 				System.out.println("Logged out successfully");
 				break;
 
 			default:
-				LOGGER.warning("Invalid menu choice entered by buyer: "
+				logger.warn("Invalid menu choice entered by buyer: "
 						+ choice + " buyerId: " + buyer.getUserId());
 				System.out.println("Invalid choice");
 			}

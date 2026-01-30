@@ -2,7 +2,7 @@ package com.revshop.service;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import com.revshop.dao.OrderDAO;
 import com.revshop.dao.impl.OrderDAOImpl;
@@ -11,8 +11,8 @@ import com.revshop.model.Order;
 import com.revshop.model.User;
 
 public class OrderService {
-	private static final Logger LOGGER =
-	        Logger.getLogger(OrderService.class.getName());
+	private static final Logger logger =
+            Logger.getLogger(OrderService.class);
 
     private OrderDAO orderDAO = new OrderDAOImpl();
  
@@ -22,12 +22,12 @@ public class OrderService {
 
 
     public void viewOrderHistory(User buyer, Scanner sc) {
-    	LOGGER.info("Order history requested. buyerId: " + buyer.getUserId());
+    	logger.info("Order history requested. buyerId: " + buyer.getUserId());
 
         List<Order> orders = orderDAO.getOrdersByBuyer(buyer.getUserId());
 
         if (orders.isEmpty()) {
-        	LOGGER.info("No orders found for buyerId: " + buyer.getUserId());
+        	logger.info("No orders found for buyerId: " + buyer.getUserId());
             System.out.println("No orders found.");
             return;
         }
@@ -47,11 +47,11 @@ public class OrderService {
         sc.nextLine();
 
         if (orderId == 0) {
-            LOGGER.info("Buyer exited order details view. buyerId: " + buyer.getUserId());
+        	logger.info("Buyer exited order details view. buyerId: " + buyer.getUserId());
             return;
         }
         
-        LOGGER.info("Buyer viewing order details. orderId: " + orderId +
+        logger.info("Buyer viewing order details. orderId: " + orderId +
                 ", buyerId: " + buyer.getUserId());
 
         List<CartItem> items = orderDAO.getOrderItems(orderId);
@@ -70,7 +70,7 @@ public class OrderService {
     	boolean hasOrders = orderDAO.hasOrdersForSeller(sellerId);
 
         if (hasOrders) {
-            LOGGER.info("Seller has orders. sellerId: " + sellerId);
+        	logger.info("Seller has orders. sellerId: " + sellerId);
         }
 
         return hasOrders;
@@ -78,12 +78,12 @@ public class OrderService {
     
     public void viewOrdersForSeller(User seller, Scanner sc) {
     	
-    	LOGGER.info("Seller viewing orders. sellerId: " + seller.getUserId());
+    	logger.info("Seller viewing orders. sellerId: " + seller.getUserId());
 
         List<Order> orders = orderDAO.getOrdersForSeller(seller.getUserId());
 
         if (orders.isEmpty()) {
-        	LOGGER.info("No orders found for sellerId: " + seller.getUserId());
+        	logger.info("No orders found for sellerId: " + seller.getUserId());
             System.out.println("No orders for your products yet.");
             return;
         }
@@ -102,18 +102,18 @@ public class OrderService {
         sc.nextLine();
 
         if (orderId == 0) {
-            LOGGER.info("Seller exited order view. sellerId: " + seller.getUserId());
+        	logger.info("Seller exited order view. sellerId: " + seller.getUserId());
             return;
         }
         
-        LOGGER.info("Seller viewing order items. orderId: " + orderId +
+        logger.info("Seller viewing order items. orderId: " + orderId +
                 ", sellerId: " + seller.getUserId());
 
         List<CartItem> items =
             orderDAO.getOrderItemsForSeller(orderId, seller.getUserId());
 
         if (items.isEmpty()) {
-        	LOGGER.info("No order items found. orderId: " + orderId +
+        	logger.info("No order items found. orderId: " + orderId +
                     ", sellerId: " + seller.getUserId());
             System.out.println("No items found for this order.");
             return;

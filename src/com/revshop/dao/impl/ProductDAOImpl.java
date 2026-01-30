@@ -1,6 +1,6 @@
 package com.revshop.dao.impl;
 
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAOImpl implements ProductDAO {
-	private static final Logger LOGGER = Logger.getLogger(ProductDAOImpl.class
-			.getName());
+	 private static final Logger logger =
+	            Logger.getLogger(ProductDAOImpl.class);
 
 	@Override
 	public void addProduct(Product product) {
@@ -39,12 +39,12 @@ public class ProductDAOImpl implements ProductDAO {
 
 			ps.executeUpdate();
 
-			LOGGER.info("Product added successfully. sellerId: "
+			logger.info("Product added successfully. sellerId: "
 					+ product.getSellerId());
 			System.out.println("Product added successfully!");
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error adding product. sellerId: "
+			logger.error("Error adding product. sellerId: "
 					+ product.getSellerId() + " | " + e.getMessage());
 			System.out.println("Error adding product");
 		} finally {
@@ -54,7 +54,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in addProduct: "
+				logger.error("Error closing DB resources in addProduct: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -93,7 +93,7 @@ public class ProductDAOImpl implements ProductDAO {
 				products.add(product);
 			}
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching products for sellerId: " + sellerId
+			logger.error("Error fetching products for sellerId: " + sellerId
 					+ " | " + e.getMessage());
 			System.out.println("Error fetching products");
 		} finally {
@@ -105,7 +105,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getProductsBySeller: "
+				logger.error("Error closing DB resources in getProductsBySeller: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -138,7 +138,7 @@ public class ProductDAOImpl implements ProductDAO {
 
 			return rows > 0;
 		} catch (SQLException e) {
-			LOGGER.severe("Error updating product. productId: "
+			logger.error("Error updating product. productId: "
 					+ product.getProductId() + ", sellerId: "
 					+ product.getSellerId() + " | " + e.getMessage());
 			System.out.println("Error updating product");
@@ -150,7 +150,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in updateProduct: "
+				logger.error("Error closing DB resources in updateProduct: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -176,7 +176,7 @@ public class ProductDAOImpl implements ProductDAO {
 
 			return rows > 0;
 		} catch (SQLException e) {
-			LOGGER.severe("Error deleting product. productId: " + productId
+			logger.error("Error deleting product. productId: " + productId
 					+ ", sellerId: " + sellerId + " | " + e.getMessage());
 			System.out.println("Error deleting product");
 			return false;
@@ -187,7 +187,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in deleteProduct: "
+				logger.error("Error closing DB resources in deleteProduct: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -220,7 +220,7 @@ public class ProductDAOImpl implements ProductDAO {
 				products.add(product);
 			}
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching all products | " + e.getMessage());
+			logger.error("Error fetching all products | " + e.getMessage());
 			System.out.println("Error fetching products");
 		} finally {
 			try {
@@ -231,7 +231,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getAllProducts: "
+				logger.error("Error closing DB resources in getAllProducts: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -269,7 +269,7 @@ public class ProductDAOImpl implements ProductDAO {
 				product.setQuantity(rs.getInt("QUANTITY"));
 			}
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching product details. productId: "
+			logger.error("Error fetching product details. productId: "
 					+ productId + " | " + e.getMessage());
 			System.out.println("Error fetching product details");
 		} finally {
@@ -281,7 +281,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getProductById: "
+				logger.error("Error closing DB resources in getProductById: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -318,7 +318,7 @@ public class ProductDAOImpl implements ProductDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching products by category: " + category
+			logger.error("Error fetching products by category: " + category
 					+ " | " + e.getMessage());
 			System.out.println("Error fetching products by category");
 		} finally {
@@ -330,7 +330,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getProductsByCategory: "
+				logger.error("Error closing DB resources in getProductsByCategory: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -373,7 +373,7 @@ public class ProductDAOImpl implements ProductDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error searching products. keyword: " + keyword
+			logger.error("Error searching products. keyword: " + keyword
 					+ " | " + e.getMessage());
 			System.out.println("Error searching products");
 		} finally {
@@ -385,7 +385,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in searchProducts: "
+				logger.error("Error closing DB resources in searchProducts: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -415,7 +415,7 @@ public class ProductDAOImpl implements ProductDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching sellerId for productId: " + productId
+			logger.error("Error fetching sellerId for productId: " + productId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -425,7 +425,7 @@ public class ProductDAOImpl implements ProductDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getSellerIdByProductId: "
+				logger.error("Error closing DB resources in getSellerIdByProductId: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}

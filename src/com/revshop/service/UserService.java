@@ -5,12 +5,12 @@ import com.revshop.model.User;
 import com.revshop.util.PasswordUtil;
 import com.revshop.dao.impl.UserDAOImpl;
 import com.revshop.dao.UserDAO;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import com.revshop.util.ValidationUtil;
 
 public class UserService {
-	private static final Logger LOGGER = Logger.getLogger(UserService.class
-			.getName());
+	private static final Logger logger =
+            Logger.getLogger(UserService.class);
 
 	private UserDAO userDAO = new UserDAOImpl();
 
@@ -21,7 +21,7 @@ public class UserService {
 
 	public void userRegistration(String role, Scanner sc) {
 
-		LOGGER.info("User registration started. Role: " + role);
+		logger.info("User registration started. Role: " + role);
 
 		System.out.print("Enter Name: ");
 		String name = sc.nextLine();
@@ -58,13 +58,13 @@ public class UserService {
 
 		userDAO.registerUser(user);
 
-		LOGGER.info("User registration completed successfully for role: "
+		logger.info("User registration completed successfully for role: "
 				+ role);
 	}
 
 	public User login(Scanner sc) {
 
-		LOGGER.info("User login attempt started");
+		logger.info("User login attempt started");
 
 		System.out.print("Enter email: ");
 		String email = sc.nextLine();
@@ -79,13 +79,13 @@ public class UserService {
 		User user = userDAO.login(email, hashedPassword);
 
 		if (user == null) {
-			LOGGER.warning("Login failed due to invalid credentials");
+			logger.warn("Login failed due to invalid credentials");
 			System.out
 					.println("\nInvalid email or password. Re-directing to Main menu.");
 			return null;
 		}
 
-		LOGGER.info("Login successful for role: " + user.getRole());
+		logger.info("Login successful for role: " + user.getRole());
 		System.out.println("\nLogin Successful");
 		return user;
 	}
@@ -133,10 +133,10 @@ public class UserService {
 
 	    if (success) {
 	        System.out.println("Password changed successfully");
-	        LOGGER.info("Password changed for userId: " + user.getUserId());
+	        logger.info("Password changed for userId: " + user.getUserId());
 	    } else {
 	        System.out.println("Old password is incorrect");
-	        LOGGER.warning("Password change failed for userId: " + user.getUserId());
+	        logger.warn("Password change failed for userId: " + user.getUserId());
 	    }
 	}
 	
@@ -165,10 +165,10 @@ public class UserService {
 
 	    if (success) {
 	        System.out.println("\nPassword reset successful");
-	        LOGGER.info("Password reset for email: " + email);
+	        logger.info("Password reset for email: " + email);
 	    } else {
 	        System.out.println("\nInvalid details. Password reset failed");
-	        LOGGER.warning("Password reset failed for email: " + email);
+	        logger.warn("Password reset failed for email: " + email);
 	    }
 	}
 }

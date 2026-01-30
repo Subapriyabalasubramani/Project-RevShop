@@ -8,13 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import com.revshop.config.DBConnection;
 
 public class CartDAOImpl implements CartDAO {
-	private static final Logger LOGGER = Logger.getLogger(CartDAOImpl.class
-			.getName());
+	private static final Logger logger = Logger.getLogger(CartDAOImpl.class);
 
 	@Override
 	public int getCartIdByBuyer(int buyerId) {
@@ -29,12 +28,12 @@ public class CartDAOImpl implements CartDAO {
 			ps.setInt(1, buyerId);
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				logger.info("Cart found for buyerId: " + buyerId);
 				return rs.getInt("CART_ID");
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error getting cartId for buyerId: " + buyerId
-					+ " | " + e.getMessage());
+			logger.error("Error getting cartId for buyerId: " + buyerId, e);
 			System.out.println("Error getting cart");
 		} finally {
 			try {
@@ -45,7 +44,7 @@ public class CartDAOImpl implements CartDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error getting cartId for buyerId: " + buyerId
+				logger.error("Error getting cartId for buyerId: " + buyerId
 						+ " | " + e.getMessage());
 				e.printStackTrace();
 			}
@@ -67,10 +66,10 @@ public class CartDAOImpl implements CartDAO {
 			ps = con.prepareStatement(sql);
 			ps.setInt(1, buyerId);
 			ps.executeUpdate();
+			logger.info("Cart created for buyerId: " + buyerId);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error getting cartId for buyerId: " + buyerId
-					+ " | " + e.getMessage());
+			logger.error("Error creating cart for buyerId: " + buyerId, e);
 			System.out.println("Error creating cart");
 		} finally {
 			try {
@@ -79,7 +78,7 @@ public class CartDAOImpl implements CartDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error getting cartId for buyerId: " + buyerId
+				logger.error("Error getting cartId for buyerId: " + buyerId
 						+ " | " + e.getMessage());
 				e.printStackTrace();
 			}
@@ -104,9 +103,11 @@ public class CartDAOImpl implements CartDAO {
 			ps.setInt(3, quantity);
 			ps.setDouble(4, price);
 			ps.executeUpdate();
+			logger.info("Item added to cart. cartId=" + cartId + ", productId="
+					+ productId);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error adding to cart. cartId: " + cartId
+			logger.error("Error adding to cart. cartId: " + cartId
 					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error adding to cart");
 		} finally {
@@ -116,7 +117,7 @@ public class CartDAOImpl implements CartDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in addToCart: "
+				logger.error("Error closing DB resources in addToCart: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -152,9 +153,10 @@ public class CartDAOImpl implements CartDAO {
 				item.setPrice(rs.getDouble("PRICE"));
 				items.add(item);
 			}
+			logger.info("Viewed cart items for cartId: " + cartId);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error viewing cart. cartId: " + cartId + " | "
+			logger.error("Error viewing cart. cartId: " + cartId + " | "
 					+ e.getMessage());
 			System.out.println("Error viewing cart");
 		} finally {
@@ -166,7 +168,7 @@ public class CartDAOImpl implements CartDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in viewCart: "
+				logger.error("Error closing DB resources in viewCart: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -192,8 +194,11 @@ public class CartDAOImpl implements CartDAO {
 			ps.setInt(3, productId);
 			ps.executeUpdate();
 
+			logger.info("Cart item updated. cartId=" + cartId + ", productId="
+					+ productId);
+
 		} catch (SQLException e) {
-			LOGGER.severe("Error updating cart item. cartId: " + cartId
+			logger.error("Error updating cart item. cartId: " + cartId
 					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error updating cart item");
 			e.printStackTrace();
@@ -204,7 +209,7 @@ public class CartDAOImpl implements CartDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in updateCartItem: "
+				logger.error("Error closing DB resources in updateCartItem: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -228,18 +233,22 @@ public class CartDAOImpl implements CartDAO {
 			ps.setInt(2, productId);
 			ps.executeUpdate();
 
+			logger.info("Item removed from cart. cartId=" + cartId
+					+ ", productId=" + productId);
+
 		} catch (SQLException e) {
-			LOGGER.severe("Error removing item from cart. cartId: " + cartId
+			logger.error("Error removing item from cart. cartId: " + cartId
 					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error removing item");
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
+				
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in removeFromCart: "
+				logger.error("Error closing DB resources in removeFromCart: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}

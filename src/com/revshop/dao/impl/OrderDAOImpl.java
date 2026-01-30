@@ -6,16 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
+import org.apache.log4j.Logger;
 import com.revshop.model.Order;
 import com.revshop.model.CartItem;
 import com.revshop.dao.OrderDAO;
 import com.revshop.config.DBConnection;
 
 public class OrderDAOImpl implements OrderDAO {
-	private static final Logger LOGGER = Logger.getLogger(OrderDAOImpl.class
-			.getName());
+	private static final Logger logger =
+            Logger.getLogger(OrderDAOImpl.class);
 
 	@Override
 	public int createOrder(Order order) {
@@ -46,9 +45,11 @@ public class OrderDAOImpl implements OrderDAO {
 			if (rs.next()) {
 				orderId = rs.getInt(1);
 			}
+			logger.info("Order created successfully. orderId=" + orderId
+                    + ", buyerId=" + order.getBuyerId());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error creating order. buyerId: "
+			logger.error("Error creating order. buyerId: "
 					+ order.getBuyerId() + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -60,7 +61,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in createOrder: "
+				logger.error("Error closing DB resources in createOrder: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -87,9 +88,12 @@ public class OrderDAOImpl implements OrderDAO {
 			ps.setDouble(4, item.getPrice());
 
 			ps.executeUpdate();
+			
+			logger.info("Order item added. orderId=" + orderId
+                    + ", productId=" + item.getProductId());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error adding order item. orderId: " + orderId
+			logger.error("Error adding order item. orderId: " + orderId
 					+ ", productId: " + item.getProductId() + " | "
 					+ e.getMessage());
 			e.printStackTrace();
@@ -100,7 +104,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in addOrderItem: "
+				logger.error("Error closing DB resources in addOrderItem: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -124,9 +128,12 @@ public class OrderDAOImpl implements OrderDAO {
 			ps.setInt(1, quantity);
 			ps.setInt(2, productId);
 			ps.executeUpdate();
+			
+			logger.info("Reduced stock. productId=" + productId
+                    + ", quantity=" + quantity);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error reducing stock. productId: " + productId
+			logger.error("Error reducing stock. productId: " + productId
 					+ ", quantity: " + quantity + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -136,7 +143,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in reduceProductStock: "
+				logger.error("Error closing DB resources in reduceProductStock: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -157,9 +164,11 @@ public class OrderDAOImpl implements OrderDAO {
 			ps = con.prepareStatement(sql);
 			ps.setInt(1, cartId);
 			ps.executeUpdate();
+			
+			logger.info("Cart cleared. cartId=" + cartId);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error clearing cart. cartId: " + cartId + " | "
+			logger.error("Error clearing cart. cartId: " + cartId + " | "
 					+ e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -169,7 +178,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in clearCart: "
+				logger.error("Error closing DB resources in clearCart: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -201,9 +210,12 @@ public class OrderDAOImpl implements OrderDAO {
 				order.setTotalAmount(rs.getDouble("TOTAL_AMOUNT"));
 				orders.add(order);
 			}
+			
+			logger.info("Fetched orders for buyerId="
+                    + buyerId + ", count=" + orders.size());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching orders for buyerId: " + buyerId
+			logger.error("Error fetching orders for buyerId: " + buyerId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -215,7 +227,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getOrdersByBuyer: "
+				logger.error("Error closing DB resources in getOrdersByBuyer: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -250,9 +262,11 @@ public class OrderDAOImpl implements OrderDAO {
 				item.setPrice(rs.getDouble("PRICE"));
 				items.add(item);
 			}
+			logger.info("Fetched order items for orderId="
+                    + orderId + ", count=" + items.size());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching order items. orderId: " + orderId
+			logger.error("Error fetching order items. orderId: " + orderId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -264,7 +278,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getOrderItems: "
+				logger.error("Error closing DB resources in getOrderItems: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -293,7 +307,7 @@ public class OrderDAOImpl implements OrderDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error checking orders for sellerId: " + sellerId
+			logger.error("Error checking orders for sellerId: " + sellerId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -303,7 +317,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in hasOrdersForSeller: "
+				logger.error("Error closing DB resources in hasOrdersForSeller: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -342,7 +356,7 @@ public class OrderDAOImpl implements OrderDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching seller orders. sellerId: " + sellerId
+			logger.error("Error fetching seller orders. sellerId: " + sellerId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -354,7 +368,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getOrdersForSeller: "
+				logger.error("Error closing DB resources in getOrdersForSeller: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -394,7 +408,7 @@ public class OrderDAOImpl implements OrderDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching seller order items. orderId: "
+			logger.error("Error fetching seller order items. orderId: "
 					+ orderId + ", sellerId: " + sellerId + " | "
 					+ e.getMessage());
 			e.printStackTrace();
@@ -407,7 +421,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getOrderItemsForSeller: "
+				logger.error("Error closing DB resources in getOrderItemsForSeller: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -443,7 +457,7 @@ public class OrderDAOImpl implements OrderDAO {
 			}
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching purchased products. buyerId: "
+			logger.error("Error fetching purchased products. buyerId: "
 					+ buyerId + " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -455,7 +469,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getPurchasedProducts: "
+				logger.error("Error closing DB resources in getPurchasedProducts: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -481,9 +495,12 @@ public class OrderDAOImpl implements OrderDAO {
 			ps.setInt(3, orderId);
 
 			ps.executeUpdate();
+			
+			logger.info("Payment updated. orderId=" + orderId
+                    + ", status=" + paymentStatus);
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error updating payment details. orderId: " + orderId
+			logger.error("Error updating payment details. orderId: " + orderId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -493,7 +510,7 @@ public class OrderDAOImpl implements OrderDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in updatePaymentDetails: "
+				logger.error("Error closing DB resources in updatePaymentDetails: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}

@@ -10,13 +10,13 @@ import com.revshop.model.CartItem;
 import com.revshop.model.Review;
 import com.revshop.model.User;
 import java.util.Scanner;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 
 public class ReviewService {
 	
-	private static final Logger LOGGER =
-	        Logger.getLogger(ReviewService.class.getName());
+	private static final Logger logger =
+            Logger.getLogger(ReviewService.class);
 	
 	 private ReviewDAO reviewDAO = new ReviewDAOImpl();
 	    private OrderDAO orderDAO = new OrderDAOImpl();
@@ -31,12 +31,12 @@ public class ReviewService {
 	    }
 
 	public void viewReviewsForSellerProducts(int sellerId) {
-		LOGGER.info("Seller requested reviews for products. sellerId: " + sellerId);
+		logger.info("Seller requested reviews for products. sellerId: " + sellerId);
 		
 	    List<Review> reviews = reviewDAO.getReviewsBySeller(sellerId);
 
 	    if (reviews.isEmpty()) {
-	    	LOGGER.info("No reviews found for sellerId: " + sellerId);
+	    	logger.info("No reviews found for sellerId: " + sellerId);
 	        System.out.println("No reviews available for your products.");
 	        return;
 	    }
@@ -54,13 +54,13 @@ public class ReviewService {
 	}
 	
 	public void addReview(User buyer, Scanner sc) {
-		LOGGER.info("Add review initiated by buyerId: " + buyer.getUserId());
+		logger.info("Add review initiated by buyerId: " + buyer.getUserId());
 
 	    List<CartItem> purchasedItems =
 	        orderDAO.getPurchasedProducts(buyer.getUserId());
 
 	    if (purchasedItems.isEmpty()) {
-	    	LOGGER.info("Buyer has no purchased products to review. buyerId: " + buyer.getUserId());
+	    	logger.info("Buyer has no purchased products to review. buyerId: " + buyer.getUserId());
 	        System.out.println("You have not purchased any products yet.");
 	        return;
 	    }
@@ -87,7 +87,7 @@ public class ReviewService {
 	    }
 
 	    if (!valid) {
-	    	LOGGER.warning("Invalid product selected for review. buyerId: " +
+	    	logger.warn("Invalid product selected for review. buyerId: " +
 	                   buyer.getUserId() + ", productId: " + productId);
 	        System.out.println("Invalid product selection.");
 	        return;
@@ -106,7 +106,7 @@ public class ReviewService {
 	        rating,
 	        comment
 	    );
-	    LOGGER.info("Review added successfully. buyerId: " +
+	    logger.info("Review added successfully. buyerId: " +
 	            buyer.getUserId() + ", productId: " + productId);
 	}
 

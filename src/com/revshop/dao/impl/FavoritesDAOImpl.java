@@ -6,15 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 import com.revshop.config.DBConnection;
 import com.revshop.dao.FavoritesDAO;
 import com.revshop.model.Favorites;
 
 public class FavoritesDAOImpl implements FavoritesDAO {
-	private static final Logger LOGGER = Logger
-			.getLogger(FavoritesDAOImpl.class.getName());
+	private static final Logger logger =
+            Logger.getLogger(FavoritesDAOImpl.class);
 
 	@Override
 	public void addFavorite(int buyerId, int productId) {
@@ -32,12 +32,12 @@ public class FavoritesDAOImpl implements FavoritesDAO {
 			ps.setInt(2, productId);
 			ps.executeUpdate();
 
-			LOGGER.info("Favorite added. buyerId: " + buyerId + ", productId: "
-					+ productId);
+			logger.info("Favorite added. buyerId=" + buyerId
+                    + ", productId=" + productId);
 			System.out.println("\nProduct added to the Wishlist.");
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error adding favorite. buyerId: " + buyerId
+			logger.error("Error adding favorite. buyerId: " + buyerId
 					+ ", productId: " + productId + " | " + e.getMessage());
 			System.out.println("Error adding favorite");
 			e.printStackTrace();
@@ -48,7 +48,7 @@ public class FavoritesDAOImpl implements FavoritesDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in addFavorite: "
+				logger.error("Error closing DB resources in addFavorite: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
@@ -80,9 +80,11 @@ public class FavoritesDAOImpl implements FavoritesDAO {
 				fav.setProductName(rs.getString("NAME"));
 				favorites.add(fav);
 			}
+			logger.info("Fetched favorites for buyerId=" + buyerId
+                    + ", count=" + favorites.size());
 
 		} catch (SQLException e) {
-			LOGGER.severe("Error fetching favorites for buyerId: " + buyerId
+			logger.error("Error fetching favorites for buyerId: " + buyerId
 					+ " | " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -94,7 +96,7 @@ public class FavoritesDAOImpl implements FavoritesDAO {
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
-				LOGGER.severe("Error closing DB resources in getFavoritesByBuyer: "
+				logger.error("Error closing DB resources in getFavoritesByBuyer: "
 						+ e.getMessage());
 				e.printStackTrace();
 			}
